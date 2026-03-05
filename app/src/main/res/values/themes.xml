@@ -2,17 +2,17 @@
 
     <!-- Base application theme. -->
     <style name="Theme.Recipify" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="colorPrimary">#1A1A2E</item>
-        <item name="colorOnPrimary">#FFFFFF</item>
-        <item name="colorPrimaryContainer">#E8E0FF</item>
-        <item name="colorOnPrimaryContainer">#1A1A2E</item>
-        <item name="colorSecondary">#A5B4FC</item>
-        <item name="colorOnSecondary">#1A1A2E</item>
+        <item name="colorPrimary">#F27405</item>
+        <item name="colorOnPrimary">#FFFF</item>
+        <item name="colorPrimaryContainer">#6DFF8A3F</item>
+        <item name="colorOnPrimaryContainer">#FFF8F5</item>
+        <item name="colorSecondary">#735745</item>
+        <item name="colorOnSecondary">#51423A</item>
         <item name="colorSurface">#FFFBFE</item>
-        <item name="colorOnSurface">#1C1B1F</item>
-        <item name="colorOnSurfaceVariant">#49454F</item>
+        <item name="colorOnSurface">#523D36</item>
+        <item name="colorOnSurfaceVariant">#4F4945</item>
         <item name="android:colorBackground">#F0F2F5</item>
-        <item name="colorOnBackground">#211F24</item>
+        <item name="colorOnBackground">#241F1F</item>
         <item name="colorError">#B91C1C</item>
         <item name="colorOnError">#FFFFFF</item>
     </style>
