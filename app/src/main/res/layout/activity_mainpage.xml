@@ -11,6 +11,21 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center"
+        android:background="?attr/colorPrimaryContainer"
+        android:elevation="8dp">
+
+        <ImageView
+            android:layout_width="200dp"
+            android:layout_height="74dp"
+            android:adjustViewBounds="true"
+            android:scaleType="fitCenter"
+            android:src="@drawable/input_page_02" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:orientation="vertical"
         android:paddingHorizontal="32dp"
@@ -19,7 +34,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Iniciar sesión"
+            android:text="Inicia sesión"
             android:textAppearance="?attr/textAppearanceHeadlineMedium"
             android:textColor="?attr/colorOnBackground"
             android:gravity="center"
@@ -45,7 +60,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="text"
-                android:imeOptions="actionNext" />
+                android:imeOptions="actionNext"
+                android:background="@drawable/input_redondeado"/>
         </com.google.android.material.textfield.TextInputLayout>
         <!-- Campo contraseña con Material -->
         <com.google.android.material.textfield.TextInputLayout
@@ -61,7 +77,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textPassword"
-                android:imeOptions="actionDone" />
+                android:imeOptions="actionDone"
+                android:background="@drawable/input_redondeado"/>
+            <com.google.android.material.button.MaterialButton
+                style="@style/Widget.Material3.Button.TextButton"
+                android:textColor="?attr/colorOnSecondary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:layout_marginTop="8dp"
+                android:text="¿Olvidaste tu contraseña?" />
         </com.google.android.material.textfield.TextInputLayout>
         <!-- Botón principal -->
         <com.google.android.material.button.MaterialButton
@@ -70,14 +95,15 @@
             android:layout_height="52dp"
             android:text="Ingresar"
             android:textAppearance="?attr/textAppearanceLabelLarge"
-            app:cornerRadius="8dp" />
+            app:cornerRadius="24dp" />
         <!-- Botón secundario -->
-        <com.google.android.material.button.MaterialButton
-            style="@style/Widget.Material3.Button.TextButton"
+        <com.google.android.material.textview.MaterialTextView
+            android:textColor="?attr/colorSecondary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
+            android:layout_gravity="center"
             android:layout_marginTop="8dp"
-            android:text="¿Olvidaste tu contraseña?" />
+            android:text="¿No tienes una cuenta? Registrate"/>
+
     </LinearLayout>
 </FrameLayout>
