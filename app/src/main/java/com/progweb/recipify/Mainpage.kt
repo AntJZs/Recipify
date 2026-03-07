@@ -38,7 +38,7 @@ class MainPageActivity : AppCompatActivity() {
                     binding.tilPassword.error = "La contraseña no puede estar vacía"
                 }
                 usuario == "admin" && password == "1234" -> {
-                    val intent = Intent(this, HomeActivity::class.java)
+                    val intent = Intent(this, HomePage::class.java)
                     intent.putExtra("usuario", usuario)
                     startActivity(intent)
                 }
