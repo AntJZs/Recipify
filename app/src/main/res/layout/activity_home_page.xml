@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/colorSurface"
+    tools:context=".HomeActivity">
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:paddingBottom="72dp"
+        android:clipToPadding="false">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Parte de arriba -->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="16dp"
+                android:paddingTop="16dp"
+                android:paddingBottom="8dp">
+
+                <ImageView
+                    android:id="@+id/ivAvatar"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:clipToOutline="true"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/input_page_01" />
+
+                <ImageView
+                    android:id="@+id/ivSettings"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:padding="4dp"
+                    android:src="@drawable/ic_menu_manage" />
+            </RelativeLayout>
+
+            <!-- Chips de filtro horizontal -->
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scrollbars="none"
+                android:paddingHorizontal="16dp"
+                android:paddingTop="12dp"
+                android:paddingBottom="4dp">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <!-- Chip activo: Todas -->
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipTodas"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Todas"
+                        android:checked="true"
+                        app:chipBackgroundColor="#FFCBB0"
+                        app:chipStrokeColor="#FFCBB0"
+                        app:checkedIconVisible="true"
+                        app:checkedIconTint="#8B3A00"
+                        android:textColor="#8B3A00"
+                        android:textStyle="bold"
+                        android:layout_marginEnd="8dp"
+                        style="@style/Widget.Material3.Chip.Filter" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipRapidas"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Rápidas"
+                        app:chipBackgroundColor="#FFFAF7"
+                        app:chipStrokeColor="#DDD"
+                        android:textColor="#444"
+                        android:layout_marginEnd="8dp"
+                        style="@style/Widget.Material3.Chip.Filter" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipPostres"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Postres"
+                        app:chipBackgroundColor="#FFFAF7"
+                        app:chipStrokeColor="#DDD"
+                        android:textColor="#444"
+                        android:layout_marginEnd="8dp"
+                        style="@style/Widget.Material3.Chip.Filter" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipVegano"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Vegano"
+                        app:chipBackgroundColor="#FFFAF7"
+                        app:chipStrokeColor="#DDD"
+                        android:textColor="#444"
+                        style="@style/Widget.Material3.Chip.Filter" />
+
+                </LinearLayout>
+            </HorizontalScrollView>
+
+            <!-- GridLayout para mostrarlos en parejas (2 columnas) -->
+            <GridLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:columnCount="2"
+                android:paddingHorizontal="12dp"
+                android:paddingTop="12dp"
+                android:paddingBottom="8dp">
+
+                <!-- Receta 1 -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cardReceta1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:layout_margin="6dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="0dp"
+                    app:cardBackgroundColor="#FFFFFF">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:id="@+id/ivReceta1"
+                            android:layout_width="match_parent"
+                            android:layout_height="160dp"
+                            />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="12dp">
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="Omelette Francés"
+                                android:textStyle="bold"
+                                android:textSize="14sp"
+                                android:textColor="#1A1A1A"
+                                />
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="7 min"
+                                android:textSize="12sp"
+                                android:textColor="#888888"
+                                android:layout_marginTop="2dp" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- Receta 2 -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cardReceta2"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:layout_margin="6dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="0dp"
+                    app:cardBackgroundColor="#FFFFFF">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:id="@+id/ivReceta2"
+                            android:layout_width="match_parent"
+                            android:layout_height="160dp"
+                            />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="12dp">
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="Sandwiches"
+                                android:textStyle="bold"
+                                android:textSize="14sp"
+                                android:textColor="#1A1A1A"
+                                />
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="15 min"
+                                android:textSize="12sp"
+                                android:textColor="#888888"
+                                android:layout_marginTop="2dp" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- Receta 3 -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cardReceta3"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:layout_margin="6dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="0dp"
+                    app:cardBackgroundColor="#FFFFFF">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:id="@+id/ivReceta4"
+                            android:layout_width="match_parent"
+                            android:layout_height="160dp"
+                            />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="12dp">
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="Tacos con carne"
+                                android:textStyle="bold"
+                                android:textSize="14sp"
+                                android:textColor="#1A1A1A"
+                                />
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="15 min"
+                                android:textSize="12sp"
+                                android:textColor="#888888"
+                                android:layout_marginTop="2dp" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+            </GridLayout>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
