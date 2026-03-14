@@ -61,7 +61,7 @@
                 android:layout_height="wrap_content"
                 android:inputType="text"
                 android:imeOptions="actionNext"
-                android:background="@drawable/input_redondeado"/>
+                android:background="@drawable/input_redondeado"/> <!-- Los border radius acá deben ser backgrounds-->
         </com.google.android.material.textfield.TextInputLayout>
         <!-- Campo contraseña con Material -->
         <com.google.android.material.textfield.TextInputLayout
