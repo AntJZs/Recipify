@@ -25,10 +25,7 @@
             android:name=".HomePage"
             android:exported="false" />
         <activity
-            android:name=".HomeActivity"
-            android:exported="false" />
-        <activity
-            android:name=".MainPageActivity"
+            android:name=".LoginActivity"
             android:exported="true">
         </activity>
     </application>
