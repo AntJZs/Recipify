@@ -36,7 +36,7 @@
             android:layout_height="wrap_content"
             android:text="Inicia sesión"
             android:textAppearance="?attr/textAppearanceHeadlineMedium"
-            android:textColor="?attr/colorOnBackground"
+            android:textColor="@color/md_theme_onSecondaryContainer"
             android:gravity="center"
             android:layout_marginBottom="8dp" />
         <TextView
@@ -44,7 +44,7 @@
             android:layout_height="wrap_content"
             android:text="Ingresa tus credenciales para continuar"
             android:textAppearance="?attr/textAppearanceBodyMedium"
-            android:textColor="?attr/colorOnSurfaceVariant"
+            android:textColor="@color/md_theme_onSecondaryContainer"
             android:gravity="center"
             android:layout_marginBottom="36dp" />
         <!-- Campo usuario con Material -->
@@ -81,7 +81,7 @@
                 android:background="@drawable/input_redondeado"/>
             <com.google.android.material.button.MaterialButton
                 style="@style/Widget.Material3.Button.TextButton"
-                android:textColor="?attr/colorOnSecondary"
+                android:textColor="@color/md_theme_onSecondaryContainer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"
@@ -98,7 +98,7 @@
             app:cornerRadius="24dp" />
         <!-- Botón secundario -->
         <com.google.android.material.textview.MaterialTextView
-            android:textColor="?attr/colorSecondary"
+            android:textColor="@color/md_theme_onSecondaryContainer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"

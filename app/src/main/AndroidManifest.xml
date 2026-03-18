@@ -12,7 +12,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".Register"
+            android:name=".Destacados"
+            android:exported="false" />
+        <activity
+            android:name=".RegisterActivity"
             android:exported="false" />
         <activity
             android:name=".LoadingActivity"
@@ -29,7 +32,8 @@
             android:exported="false" />
         <activity
             android:name=".LoginActivity"
-            android:exported="true"></activity>
+            android:exported="true">
+        </activity>
     </application>
 
 </manifest>
