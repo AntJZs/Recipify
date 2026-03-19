@@ -55,4 +55,11 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:34.10.0"))
     implementation("com.google.firebase:firebase-analytics")
 
+    // ViewModel
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.0")
+    // Lifecycle para collectAsStateWithLifecycle en Compose
+    // o repeatOnLifecycle en View system
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.0")
+    // Activity KTX para viewModels() delegate
+    implementation("androidx.activity:activity-ktx:1.9.0")
 }
