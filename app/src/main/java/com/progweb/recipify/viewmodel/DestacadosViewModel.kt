@@ -1,4 +1,5 @@
 package com.progweb.recipify.viewmodel
 
-class DestacadosViewModel {
-}
+import androidx.lifecycle.ViewModel
+
+class DestacadosViewModel : ViewModel()
