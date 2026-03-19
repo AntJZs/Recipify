@@ -1,12 +1,13 @@
 package com.progweb.recipify
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
-import android.content.Intent
+import com.google.android.material.textview.MaterialTextView
 
 class RegisterActivity : AppCompatActivity() {
 
@@ -22,7 +23,6 @@ class RegisterActivity : AppCompatActivity() {
     private lateinit var etPassword: TextInputEditText
     private lateinit var etConfPassword: TextInputEditText
 
-
     private lateinit var btnCrear: MaterialButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,11 +32,9 @@ class RegisterActivity : AppCompatActivity() {
         initViews()
         setupListeners()
 
-        val tvLogin = findViewById<com.google.android.material.textview.MaterialTextView>(R.id.tvLogin)
-
+        val tvLogin = findViewById<MaterialTextView>(R.id.tvLogin)
         tvLogin.setOnClickListener {
-            val intent = Intent(this, LoginActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, LoginActivity::class.java))
         }
     }
 
@@ -73,7 +71,6 @@ class RegisterActivity : AppCompatActivity() {
 
         var valido = true
 
-        // Limpiar errores
         tilUsuario.error = null
         tilName.error = null
         tilLastname.error = null
@@ -118,14 +115,29 @@ class RegisterActivity : AppCompatActivity() {
         val usuario = etUsuario.text.toString().trim()
         val nombre = etName.text.toString().trim()
         val apellido = etLastname.text.toString().trim()
+        val password = etPassword.text.toString()
 
-        // Aquí iría tu lógica real:
-        // Firebase, API, base de datos, etc.
+        if (UsuariosManager.usuarios.containsKey(usuario)) {
+            tilUsuario.error = "El usuario ya existe"
+            return
+        }
+
+        val nuevoUsuario = UsuariosManager.Usuario(
+            usuario,
+            nombre,
+            apellido,
+            password
+        )
+
+        UsuariosManager.usuarios[usuario] = nuevoUsuario
 
         Toast.makeText(
             this,
             "Usuario $usuario registrado correctamente",
             Toast.LENGTH_LONG
         ).show()
+
+        startActivity(Intent(this, HomePage::class.java))
+        finish()
     }
 }
