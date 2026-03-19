@@ -98,6 +98,7 @@
             app:cornerRadius="24dp" />
         <!-- Botón secundario -->
         <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tvRegister"
             android:textColor="@color/md_theme_onSecondaryContainer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
