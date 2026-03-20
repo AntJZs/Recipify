@@ -1,9 +1,9 @@
 package com.progweb.recipify.datamodels
 
 data class Recipe(
-    val id: Int,
-    val nombre: String,
-    val tiempo: Int,
-    val categorias: List<String>,
-    val imagenRes: Int? = null
+    val id: String,
+    val name: String,
+    val totalTimeMinutes: Int,
+    val category: List<String>,
+    val imageURL: Int? = null
 )

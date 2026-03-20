@@ -28,12 +28,12 @@ class RecipeAdapter(
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(recipe: Recipe) {
-            binding.tvNombreItem.text = recipe.nombre
-            binding.tvTiempoItem.text = "${recipe.tiempo} min"
+            binding.tvNombreItem.text = recipe.name
+            binding.tvTiempoItem.text = "${recipe.totalTimeMinutes} min"
 
             // Imagen opcional — cuando conectes Firebase usa Glide aquí:
             // Glide.with(binding.root).load(recipe.imagenUrl).into(binding.ivRecetaItem)
-            recipe.imagenRes?.let {
+            recipe.imageURL?.let {
                 binding.ivRecetaItem.setImageResource(it)
             }
 
