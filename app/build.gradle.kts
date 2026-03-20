@@ -53,8 +53,7 @@ dependencies {
     implementation("androidx.core:core-splashscreen:1.0.1")
     // For firebase stuff
     implementation(platform("com.google.firebase:firebase-bom:34.10.0"))
-    implementation("com.google.firebase:firebase-analytics")
-
+    implementation("com.google.firebase:firebase-firestore")
     // ViewModel
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.0")
     // Lifecycle para collectAsStateWithLifecycle en Compose

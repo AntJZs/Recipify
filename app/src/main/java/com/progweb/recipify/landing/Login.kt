@@ -1,60 +1,55 @@
 package com.progweb.recipify
+
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.textview.MaterialTextView
 import com.progweb.recipify.databinding.ActivityLoginBinding
+import com.progweb.recipify.viewmodel.LoginViewModel
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
+    private val viewModel: LoginViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.main)
-        val tvRegister = findViewById<MaterialTextView>(R.id.tvRegister)
-        tvRegister.setOnClickListener {
+
+        findViewById<MaterialTextView>(R.id.tvRegister).setOnClickListener {
             startActivity(Intent(this, RegisterActivity::class.java))
         }
+
         ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-        binding.btnIngresar.setOnClickListener {
 
+        setupObservers()
+
+        binding.btnIngresar.setOnClickListener {
             val usuario = binding.etUsuario.text.toString().trim()
             val password = binding.etPassword.text.toString().trim()
+            viewModel.login(usuario, password)
+        }
+    }
 
-            binding.tilUsuario.error = null
-            binding.tilPassword.error = null
+    private fun setupObservers() {
+        viewModel.loginState.observe(this) { result ->
+            binding.tilUsuario.error = result.errorUsuario
+            binding.tilPassword.error = result.errorPassword
 
-            when {
-                usuario.isEmpty() -> {
-                    binding.tilUsuario.error = "El usuario no puede estar vacío"
-                }
-
-                password.isEmpty() -> {
-                    binding.tilPassword.error = "La contraseña no puede estar vacía"
-                }
-
-                else -> {
-                    val usuarioGuardado = UsuariosManager.usuarios[usuario]
-
-                    if (usuarioGuardado != null && usuarioGuardado.password == password || usuario == "admin" && password == "1234") {
-
-                        val intent = Intent(this, HomePage::class.java)
-                        intent.putExtra("usuario", usuario)
-                        startActivity(intent)
-
-                    } else {
-                        binding.tilPassword.error = "Usuario o contraseña incorrectos"
-                        binding.etPassword.text?.clear()
-                    }
-                }
+            if (result.success) {
+                val intent = Intent(this, HomePage::class.java)
+                intent.putExtra("usuario", result.usuario)
+                startActivity(intent)
+                finish()
             }
         }
     }

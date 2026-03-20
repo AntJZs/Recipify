@@ -1,17 +1,22 @@
 package com.progweb.recipify.addRecipe
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.progweb.recipify.databinding.ActivityAddRecipeBinding
-import android.widget.Toast
+import com.google.firebase.Firebase
+import com.google.firebase.firestore.firestore
 import com.progweb.recipify.R
+import com.progweb.recipify.databinding.ActivityAddRecipeBinding
+import com.progweb.recipify.viewmodel.AddRecipeViewModel
 
 class AddRecipe : AppCompatActivity() {
-
+    val db = Firebase.firestore
     private lateinit var binding: ActivityAddRecipeBinding
+    private val viewModel: AddRecipeViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,12 +31,15 @@ class AddRecipe : AppCompatActivity() {
             insets
         }
 
-        configurarBotones()
+        setupListeners()
+        setupObservers()
     }
 
-    private fun configurarBotones() {
+    private fun setupListeners() {
         binding.btnGuardar.setOnClickListener {
-            if (validarCampos()) guardarReceta()
+            val nombre = binding.etNombre.text.toString()
+            val tiempo = binding.etTiempo.text.toString()
+            viewModel.saveRecipe(nombre, tiempo)
         }
 
         binding.btnCancelar.setOnClickListener {
@@ -39,32 +47,20 @@ class AddRecipe : AppCompatActivity() {
         }
     }
 
-    private fun validarCampos(): Boolean {
-        var valido = true
-        binding.tilNombre.error = null
-        binding.tilTiempo.error = null
+    private fun setupObservers() {
+        viewModel.saveResult.observe(this) { result ->
+            binding.tilNombre.error = result.errorNombre
+            binding.tilTiempo.error = result.errorTiempo
+            db.collection("recipe").add(
+                hashMapOf(
+                    "name" to binding.etNombre.text.toString(),
+                    "totalTimeMinutes" to binding.etTiempo.text.toString().toInt(),
+                    ))
 
-        if (binding.etNombre.text.toString().trim().isEmpty()) {
-            binding.tilNombre.error = "Ingresa el nombre del plato"
-            valido = false
+            if (result.success) {
+                Toast.makeText(this, getString(R.string.msg_receta_guardada), Toast.LENGTH_SHORT).show()
+                finish()
+            }
         }
-
-        val tiempo = binding.etTiempo.text.toString().trim()
-        if (tiempo.isEmpty()) {
-            binding.tilTiempo.error = "Ingresa el tiempo de preparación"
-            valido = false
-        } else if (tiempo.toIntOrNull() == null) {
-            binding.tilTiempo.error = "Ingresa un número válido"
-            valido = false
-        }
-
-        return valido
-    }
-
-    private fun guardarReceta() {
-        // TODO: guardar en Firebase cuando esté lista la conexión
-
-        Toast.makeText(this, getString(R.string.msg_receta_guardada), Toast.LENGTH_SHORT).show()
-        finish()
     }
 }

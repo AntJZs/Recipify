@@ -3,15 +3,16 @@ package com.progweb.recipify
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.progweb.recipify.LoginActivity
-import com.progweb.recipify.R
 import com.progweb.recipify.databinding.ActivityDestacadosBinding
+import com.progweb.recipify.viewmodel.DestacadosViewModel
 
 class Destacados : AppCompatActivity() {
     private lateinit var binding: ActivityDestacadosBinding
+    private val viewModel: DestacadosViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,12 +26,32 @@ class Destacados : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-        // Botones del hero
+
+        setupListeners()
+        setupObservers()
+    }
+
+    private fun setupListeners() {
         binding.btnRegistrarse.setOnClickListener {
-            startActivity(Intent(this, RegisterActivity::class.java))
+            viewModel.onRegisterClicked()
         }
         binding.btnIniciarSesion.setOnClickListener {
-            startActivity(Intent(this, LoginActivity::class.java))
+            viewModel.onLoginClicked()
+        }
+    }
+
+    private fun setupObservers() {
+        viewModel.navigateToLogin.observe(this) { navigate ->
+            if (navigate) {
+                startActivity(Intent(this, LoginActivity::class.java))
+                viewModel.onNavigationDone()
+            }
+        }
+        viewModel.navigateToRegister.observe(this) { navigate ->
+            if (navigate) {
+                startActivity(Intent(this, RegisterActivity::class.java))
+                viewModel.onNavigationDone()
+            }
         }
     }
 }

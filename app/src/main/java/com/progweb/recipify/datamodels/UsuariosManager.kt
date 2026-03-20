@@ -1,4 +1,4 @@
-package com.progweb.recipify
+package com.progweb.recipify.com.progweb.recipify.datamodels
 
 object UsuariosManager {
 
