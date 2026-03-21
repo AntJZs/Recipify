@@ -3,10 +3,12 @@ package com.progweb.recipify.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.google.firebase.firestore.FirebaseFirestore
 import com.progweb.recipify.datamodels.Recipe
 
 class HomeViewModel : ViewModel() {
 
+    private val db = FirebaseFirestore.getInstance()
     private val _todasLasRecetas = MutableLiveData<List<Recipe>>()
 
     private val _recetasFiltradas = MutableLiveData<List<Recipe>>()
@@ -16,21 +18,27 @@ class HomeViewModel : ViewModel() {
     val categoriaSeleccionada: LiveData<String?> = _categoriaSeleccionada
 
     init {
-        cargarDatos()
+        fetchRecipesFromFirestore()
     }
 
-    private fun cargarDatos() {
-        // TODO: reemplazar con Firebase cuando esté lista la conexión
-        val recetas = listOf(
-            Recipe(name = "Omelette Francés", totalTimeMinutes = 7,  category = listOf("rapidas"), id = "1"),
-            Recipe(name = "Sandwiches",       totalTimeMinutes = 15, category = listOf("rapidas"), id = "2"),
-            Recipe(name = "Tacos con carne",  totalTimeMinutes = 15, category = listOf("todas"),   id = "3"),
-            Recipe(name = "Tiramisú",         totalTimeMinutes = 30, category = listOf("postres"), id = "4"),
-            Recipe(name = "Ensalada Verde",   totalTimeMinutes = 10, category = listOf("vegano"),  id = "5"),
-            Recipe(name = "Hamburguesa",      totalTimeMinutes = 20, category = listOf("todas"),   id = "6")
-        )
-        _todasLasRecetas.value = recetas
-        aplicarFiltroActual()
+    private fun fetchRecipesFromFirestore() {
+        db.collection("recipe")
+            .addSnapshotListener { value, error ->
+                if (error != null) {
+                    return@addSnapshotListener
+                }
+
+                val recipes = mutableListOf<Recipe>()
+                value?.documents?.forEach { doc ->
+                    val recipe = doc.toObject(Recipe::class.java)
+                    recipe?.let {
+                        it.id = doc.id
+                        recipes.add(it)
+                    }
+                }
+                _todasLasRecetas.value = recipes
+                filtrar(_categoriaSeleccionada.value ?: null)
+            }
     }
 
     fun filtrar(categoria: String?) {
@@ -47,12 +55,5 @@ class HomeViewModel : ViewModel() {
         } else {
             todas.filter { it.category.contains(categoria) }
         }
-    }
-
-    fun agregarReceta(recipe: Recipe) {
-        val listaActual = _todasLasRecetas.value?.toMutableList() ?: mutableListOf()
-        listaActual.add(recipe)
-        _todasLasRecetas.value = listaActual
-        aplicarFiltroActual()
     }
 }
