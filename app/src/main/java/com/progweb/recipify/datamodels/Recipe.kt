@@ -7,7 +7,7 @@ data class Recipe(
     var name: String = "",
 
     @get:PropertyName("totalTimeMinutes") @set:PropertyName("totalTimeMinutes")
-    var totalTimeMinutes: Int = 0,
+    var totalTimeMinutes: Long = 0,
 
     @get:PropertyName("category") @set:PropertyName("category")
     var category: List<String> = emptyList(),

@@ -1,5 +1,6 @@
 package com.progweb.recipify
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -19,6 +20,16 @@ class HomePage : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        val prefs = getSharedPreferences("user_session", MODE_PRIVATE)
+        val isLogged = prefs.getBoolean("isLogged", false)
+        android.util.Log.d("SESSION", "isLogged en HomePage: $isLogged")
+
+        if (!isLogged) {
+            startActivity(Intent(this, Destacados::class.java))
+            finish()
+            return
+        }
 
         binding = ActivityHomePageBinding.inflate(layoutInflater)
         setContentView(binding.root)
