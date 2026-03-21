@@ -5,14 +5,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.PopupMenu
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
+import com.google.android.material.chip.Chip
 import com.progweb.recipify.R
-import com.progweb.recipify.Destacados
 import com.progweb.recipify.addRecipe.AddRecipe
 import com.progweb.recipify.databinding.FragmentHomeBinding
 import com.progweb.recipify.viewmodel.HomeViewModel
@@ -38,55 +35,10 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         configurarRecyclerView()
-        configurarChips()
         configurarFab()
         observarViewModel()
-        configurarMenu() // 👈 AQUÍ agregamos el menú
     }
 
-    // 🔧 CONFIGURAR POPUP MENU
-    private fun configurarMenu() {
-        val btnSettings = binding.ivSettings // asegúrate que este ID exista en tu XML
-
-        btnSettings.setOnClickListener { view ->
-            val popup = PopupMenu(requireContext(), view)
-            popup.menuInflater.inflate(R.menu.menu_settings, popup.menu)
-
-            popup.setOnMenuItemClickListener { item ->
-                when (item.itemId) {
-
-                    R.id.menu_editar -> {
-                        Toast.makeText(requireContext(), "Editar información", Toast.LENGTH_SHORT).show()
-                        true
-                    }
-
-                    R.id.menu_compartir -> {
-                        Toast.makeText(requireContext(), "Compartir perfil", Toast.LENGTH_SHORT).show()
-                        true
-                    }
-
-                    R.id.menu_logout -> {
-                        cerrarSesion()
-                        true
-                    }
-
-                    else -> false
-                }
-            }
-
-            popup.show()
-        }
-    }
-    private fun cerrarSesion() {
-        val prefs = requireActivity().getSharedPreferences("user_session", android.content.Context.MODE_PRIVATE)
-        prefs.edit().clear().apply()
-
-        val intent = Intent(requireActivity(), Destacados::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-
-        startActivity(intent)
-        requireActivity().finish()
-    }
     private fun configurarRecyclerView() {
         adapter = RecipeAdapter { recipe ->
             // TODO: navegar al detalle de la receta
@@ -94,32 +46,46 @@ class HomeFragment : Fragment() {
         binding.rvRecetas.adapter = adapter
         binding.rvRecetas.layoutManager = GridLayoutManager(requireContext(), 2)
     }
+
     private fun observarViewModel() {
+        // Observer for recipes
         viewModel.recetasFiltradas.observe(viewLifecycleOwner) { recetas ->
             adapter.submitList(recetas)
         }
 
-        viewModel.categoriaSeleccionada.observe(viewLifecycleOwner) { categoria ->
-            when (categoria) {
-                "rapidas" -> binding.chipRapidas.isChecked = true
-                "postres" -> binding.chipPostres.isChecked = true
-                "vegano"  -> binding.chipVegano.isChecked  = true
-                null      -> binding.chipGroup.clearCheck()
+        // Observer for dynamic categories
+        viewModel.categorias.observe(viewLifecycleOwner) { categorias ->
+            actualizarChips(categorias)
+        }
+
+        // Observer for selected category
+        viewModel.categoriaSeleccionada.observe(viewLifecycleOwner) { selectedCategory ->
+            // Update chip states if necessary
+            for (i in 0 until binding.chipGroup.childCount) {
+                val chip = binding.chipGroup.getChildAt(i) as Chip
+                chip.isChecked = (chip.text == selectedCategory)
             }
         }
     }
-    private fun configurarChips() {
-        binding.chipGroup.setOnCheckedStateChangeListener { _, checkedIds ->
-            val selectedId = checkedIds.firstOrNull()
-            val categoria = when (selectedId) {
-                binding.chipRapidas.id -> "rapidas"
-                binding.chipPostres.id -> "postres"
-                binding.chipVegano.id  -> "vegano"
-                else -> null
+
+    private fun actualizarChips(categorias: List<String>) {
+        val currentSelected = viewModel.categoriaSeleccionada.value
+        binding.chipGroup.removeAllViews()
+
+        categorias.forEach { categoria ->
+            val chip = layoutInflater.inflate(R.layout.layout_chip_filter, binding.chipGroup, false) as Chip
+            chip.text = categoria
+            chip.isChecked = (categoria == currentSelected)
+            
+            chip.setOnCheckedChangeListener { _, isChecked ->
+                if (isChecked) {
+                    viewModel.filtrar(categoria)
+                } else if (binding.chipGroup.checkedChipId == View.NO_ID) {
+                    // If the currently checked chip was unchecked and none other is checked
+                    viewModel.filtrar(null)
+                }
             }
-            if (viewModel.categoriaSeleccionada.value != categoria) {
-                viewModel.filtrar(categoria)
-            }
+            binding.chipGroup.addView(chip)
         }
     }
 

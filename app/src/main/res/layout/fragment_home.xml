@@ -56,44 +56,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:singleSelection="true"
-                    app:selectionRequired="false">
-
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/chipRapidas"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Rápidas"
-                        android:checkable="true"
-                        android:textColor="@color/md_theme_onSurface"
-                        app:chipBackgroundColor="@color/md_theme_surfaceContainerLow"
-                        app:chipStrokeColor="@color/md_theme_outlineVariant"
-                        android:layout_marginEnd="8dp"
-                        style="@style/Widget.Material3.Chip.Filter" />
-
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/chipPostres"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Postres"
-                        android:checkable="true"
-                        android:textColor="@color/md_theme_onSurface"
-                        app:chipBackgroundColor="@color/md_theme_surfaceContainerLow"
-                        app:chipStrokeColor="@color/md_theme_outlineVariant"
-                        android:layout_marginEnd="8dp"
-                        style="@style/Widget.Material3.Chip.Filter" />
-
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/chipVegano"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Vegano"
-                        android:checkable="true"
-                        android:textColor="@color/md_theme_onSurface"
-                        app:chipBackgroundColor="@color/md_theme_surfaceContainerLow"
-                        app:chipStrokeColor="@color/md_theme_outlineVariant"
-                        style="@style/Widget.Material3.Chip.Filter" />
-
-                </com.google.android.material.chip.ChipGroup>
+                    app:selectionRequired="false" />
             </HorizontalScrollView>
 
             <androidx.recyclerview.widget.RecyclerView

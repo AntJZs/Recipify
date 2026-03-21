@@ -17,6 +17,9 @@ class HomeViewModel : ViewModel() {
     private val _categoriaSeleccionada = MutableLiveData<String?>(null)
     val categoriaSeleccionada: LiveData<String?> = _categoriaSeleccionada
 
+    private val _categorias = MutableLiveData<List<String>>()
+    val categorias: LiveData<List<String>> = _categorias
+
     init {
         fetchRecipesFromFirestore()
     }
@@ -29,19 +32,29 @@ class HomeViewModel : ViewModel() {
                 }
 
                 val recipes = mutableListOf<Recipe>()
+                val allCategories = mutableSetOf<String>()
+
                 value?.documents?.forEach { doc ->
                     try {
                         val recipe = doc.toObject(Recipe::class.java)
                         recipe?.let {
                             it.id = doc.id
                             recipes.add(it)
+                            allCategories.addAll(it.category)
                         }
                     } catch (e: Exception) {
                         android.util.Log.e("FIRESTORE", "Error en doc: ${doc.id}", e)
                     }
                 }
                 _todasLasRecetas.value = recipes
-                filtrar(_categoriaSeleccionada.value ?: null)
+                _categorias.value = allCategories.toList().sorted()
+                
+                // If the selected category no longer exists, reset it
+                if (_categoriaSeleccionada.value != null && !allCategories.contains(_categoriaSeleccionada.value)) {
+                    _categoriaSeleccionada.value = null
+                }
+                
+                aplicarFiltroActual()
             }
     }
 
