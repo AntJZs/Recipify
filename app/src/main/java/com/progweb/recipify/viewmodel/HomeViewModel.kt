@@ -30,10 +30,14 @@ class HomeViewModel : ViewModel() {
 
                 val recipes = mutableListOf<Recipe>()
                 value?.documents?.forEach { doc ->
-                    val recipe = doc.toObject(Recipe::class.java)
-                    recipe?.let {
-                        it.id = doc.id
-                        recipes.add(it)
+                    try {
+                        val recipe = doc.toObject(Recipe::class.java)
+                        recipe?.let {
+                            it.id = doc.id
+                            recipes.add(it)
+                        }
+                    } catch (e: Exception) {
+                        android.util.Log.e("FIRESTORE", "Error en doc: ${doc.id}", e)
                     }
                 }
                 _todasLasRecetas.value = recipes

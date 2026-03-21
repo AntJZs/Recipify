@@ -9,6 +9,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.textview.MaterialTextView
 import com.progweb.recipify.databinding.ActivityLoginBinding
+import com.progweb.recipify.home.HomeFragment
 import com.progweb.recipify.viewmodel.LoginViewModel
 
 class LoginActivity : AppCompatActivity() {
@@ -46,6 +47,11 @@ class LoginActivity : AppCompatActivity() {
             binding.tilPassword.error = result.errorPassword
 
             if (result.success) {
+                val prefs = getSharedPreferences("user_session", MODE_PRIVATE)
+                prefs.edit()
+                    .putBoolean("isLogged", true)
+                    .putString("usuario", result.usuario)
+                    .apply()
                 val intent = Intent(this, HomePage::class.java)
                 intent.putExtra("usuario", result.usuario)
                 startActivity(intent)
