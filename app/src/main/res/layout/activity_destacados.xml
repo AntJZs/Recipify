@@ -95,7 +95,7 @@
                             android:text="Registrarse"
                             android:textColor="@color/md_theme_surfaceVariant"
                             app:cornerRadius="24dp"
-                            app:icon="@android:drawable/ic_menu_myplaces"
+                            app:icon="@drawable/front_hand_24px"
                             app:iconTint="@color/md_theme_surfaceVariant" />
 
                         <com.google.android.material.button.MaterialButton
@@ -107,7 +107,7 @@
                             android:textColor="@color/md_theme_onSurface"
                             app:cornerRadius="24dp"
                             app:backgroundTint="@color/md_theme_surfaceContainerLow"
-                            app:icon="@android:drawable/ic_menu_myplaces"
+                            app:icon="@drawable/account_circle_24px"
                             app:iconTint="@color/md_theme_onSurface"
                             app:strokeColor="@color/md_theme_surfaceContainerLow"
                             app:strokeWidth="1dp" />
