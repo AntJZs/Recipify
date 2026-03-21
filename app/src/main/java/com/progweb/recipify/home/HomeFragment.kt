@@ -5,11 +5,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.PopupMenu
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.chip.Chip
 import com.progweb.recipify.R
+import com.progweb.recipify.Destacados
 import com.progweb.recipify.addRecipe.AddRecipe
 import com.progweb.recipify.databinding.FragmentHomeBinding
 import com.progweb.recipify.viewmodel.HomeViewModel
@@ -37,8 +41,52 @@ class HomeFragment : Fragment() {
         configurarRecyclerView()
         configurarFab()
         observarViewModel()
+        configurarMenu() // 👈 AQUÍ agregamos el menú
     }
 
+    // 🔧 CONFIGURAR POPUP MENU
+    private fun configurarMenu() {
+        val btnSettings = binding.ivSettings // asegúrate que este ID exista en tu XML
+
+        btnSettings.setOnClickListener { view ->
+            val popup = PopupMenu(requireContext(), view)
+            popup.menuInflater.inflate(R.menu.menu_settings, popup.menu)
+
+            popup.setOnMenuItemClickListener { item ->
+                when (item.itemId) {
+
+                    R.id.menu_editar -> {
+                        Toast.makeText(requireContext(), "Editar información", Toast.LENGTH_SHORT).show()
+                        true
+                    }
+
+                    R.id.menu_compartir -> {
+                        Toast.makeText(requireContext(), "Compartir perfil", Toast.LENGTH_SHORT).show()
+                        true
+                    }
+
+                    R.id.menu_logout -> {
+                        cerrarSesion()
+                        true
+                    }
+
+                    else -> false
+                }
+            }
+
+            popup.show()
+        }
+    }
+    private fun cerrarSesion() {
+        val prefs = requireActivity().getSharedPreferences("user_session", android.content.Context.MODE_PRIVATE)
+        prefs.edit().clear().apply()
+
+        val intent = Intent(requireActivity(), Destacados::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+
+        startActivity(intent)
+        requireActivity().finish()
+    }
     private fun configurarRecyclerView() {
         adapter = RecipeAdapter { recipe ->
             // TODO: navegar al detalle de la receta
