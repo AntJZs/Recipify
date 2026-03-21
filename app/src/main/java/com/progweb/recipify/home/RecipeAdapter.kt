@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.progweb.recipify.datamodels.Recipe
 import com.progweb.recipify.databinding.ItemRecipeBinding
 
@@ -31,9 +32,9 @@ class RecipeAdapter(
             binding.tvNombreItem.text = recipe.name
             binding.tvTiempoItem.text = "${recipe.totalTimeMinutes} min"
 
-            // Glide or similar should be used for imageURL
-            // For now, we just clear it or use a placeholder if we can't add the dependency
-            binding.ivRecetaItem.setImageResource(0)
+            // Se pone la imagen si existe en Firebase
+            Glide.with(binding.root).load(recipe.imageURL).into(binding.ivRecetaItem)
+
 
             binding.root.setOnClickListener { onItemClick(recipe) }
         }

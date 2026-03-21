@@ -56,29 +56,28 @@ class HomeFragment : Fragment() {
                 "rapidas" -> binding.chipRapidas.isChecked = true
                 "postres" -> binding.chipPostres.isChecked = true
                 "vegano"  -> binding.chipVegano.isChecked  = true
-                else      -> binding.chipTodas.isChecked   = true
+                null      -> binding.chipGroup.clearCheck()
             }
         }
     }
 
     private fun configurarChips() {
-        binding.chipTodas.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) viewModel.filtrar("todas")
-        }
-        binding.chipRapidas.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) viewModel.filtrar("rapidas")
-        }
-        binding.chipPostres.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) viewModel.filtrar("postres")
-        }
-        binding.chipVegano.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) viewModel.filtrar("vegano")
+        binding.chipGroup.setOnCheckedStateChangeListener { group, checkedIds ->
+            val selectedId = checkedIds.firstOrNull()
+            val categoria = when (selectedId) {
+                binding.chipRapidas.id -> "rapidas"
+                binding.chipPostres.id -> "postres"
+                binding.chipVegano.id  -> "vegano"
+                else -> null
+            }
+            if (viewModel.categoriaSeleccionada.value != categoria) {
+                viewModel.filtrar(categoria)
+            }
         }
     }
 
     private fun configurarFab() {
         binding.fabAgregarReceta.setOnClickListener {
-            // Abre AddRecipe como pantalla completa
             startActivity(Intent(requireContext(), AddRecipe::class.java))
         }
     }

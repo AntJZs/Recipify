@@ -14,8 +14,8 @@ class HomeViewModel : ViewModel() {
     private val _recetasFiltradas = MutableLiveData<List<Recipe>>()
     val recetasFiltradas: LiveData<List<Recipe>> = _recetasFiltradas
 
-    private val _categoriaSeleccionada = MutableLiveData("todas")
-    val categoriaSeleccionada: LiveData<String> = _categoriaSeleccionada
+    private val _categoriaSeleccionada = MutableLiveData<String?>(null)
+    val categoriaSeleccionada: LiveData<String?> = _categoriaSeleccionada
 
     init {
         fetchRecipesFromFirestore()
@@ -37,17 +37,23 @@ class HomeViewModel : ViewModel() {
                     }
                 }
                 _todasLasRecetas.value = recipes
-                filtrar(_categoriaSeleccionada.value ?: "todas")
+                filtrar(_categoriaSeleccionada.value ?: null)
             }
     }
 
-    fun filtrar(categoria: String) {
+    fun filtrar(categoria: String?) {
         _categoriaSeleccionada.value = categoria
-        val all = _todasLasRecetas.value ?: emptyList()
-        _recetasFiltradas.value = if (categoria == "todas") {
-            all
+        aplicarFiltroActual()
+    }
+
+    private fun aplicarFiltroActual() {
+        val categoria = _categoriaSeleccionada.value
+        val todas = _todasLasRecetas.value ?: emptyList()
+
+        _recetasFiltradas.value = if (categoria == null) {
+            todas
         } else {
-            all.filter { it.category.contains(categoria) }
+            todas.filter { it.category.contains(categoria) }
         }
     }
 }
