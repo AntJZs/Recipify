@@ -7,13 +7,18 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import com.progweb.recipify.R
 import com.progweb.recipify.databinding.ActivityAddRecipeBinding
 import com.progweb.recipify.viewmodel.AddRecipeViewModel
+import kotlinx.coroutines.launch
 
 class AddRecipe : AppCompatActivity() {
+
     val db = Firebase.firestore
     private lateinit var binding: ActivityAddRecipeBinding
     private val viewModel: AddRecipeViewModel by viewModels()
@@ -48,19 +53,37 @@ class AddRecipe : AppCompatActivity() {
     }
 
     private fun setupObservers() {
-        viewModel.saveResult.observe(this) { result ->
-            binding.tilNombre.error = result.errorNombre
-            binding.tilTiempo.error = result.errorTiempo
-            db.collection("recipe").add(
-                hashMapOf(
-                    "name" to binding.etNombre.text.toString(),
-                    "totalTimeMinutes" to binding.etTiempo.text.toString().toInt(),
-                    ))
-
-            if (result.success) {
-                Toast.makeText(this, getString(R.string.msg_receta_guardada), Toast.LENGTH_SHORT).show()
-                finish()
+        // repeatOnLifecycle es el equivalente correcto de observe() para StateFlow
+        // Se cancela automáticamente cuando la Activity va a background (STARTED)
+        // y se reanuda cuando vuelve — evita procesar eventos con la UI invisible
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiState.collect { estado ->
+                    actualizarUI(estado)
+                }
             }
         }
     }
+
+    private fun actualizarUI(estado: AddRecipeViewModel.UiState) {
+        // Muestra errores de validación en los campos
+        binding.tilNombre.error = estado.errorNombre
+        binding.tilTiempo.error = estado.errorTiempo
+
+        // Deshabilita el botón mientras está guardando — evita doble clic
+        binding.btnGuardar.isEnabled = !estado.guardando
+
+        // Cuando termina con éxito
+        if (estado.success) {
+            db.collection("recipe").add(
+                hashMapOf(
+                    "name" to binding.etNombre.text.toString(),
+                    "totalTimeMinutes" to binding.etTiempo.text.toString().toInt()
+                )
+            )
+            Toast.makeText(this, getString(R.string.msg_receta_guardada), Toast.LENGTH_SHORT).show()
+            finish()
+        }
+    }
 }
+
