@@ -1,25 +1,33 @@
 package com.progweb.recipify.viewmodel
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 class AddRecipeViewModel : ViewModel() {
 
-    private val _saveResult = MutableLiveData<SaveResult>()
-    val saveResult: LiveData<SaveResult> = _saveResult
-
-
-
-
-
-    data class SaveResult(
+    // UiState agrupa TODO el estado de la pantalla en un solo objeto
+    data class UiState(
+        val guardando: Boolean = false,       // controla el doble clic
         val success: Boolean = false,
         val errorNombre: String? = null,
         val errorTiempo: String? = null
     )
 
+    // MutableStateFlow privado — solo el ViewModel puede modificarlo
+    private val _uiState = MutableStateFlow(UiState())
+
+    // StateFlow público — el Fragment solo puede leerlo
+    val uiState: StateFlow<UiState> = _uiState.asStateFlow()
+
     fun saveRecipe(nombre: String, tiempo: String) {
+
+        // Evita doble clic — si ya está guardando, ignora la llamada
+        if (_uiState.value.guardando) return
+
         var hasError = false
         var errorNombre: String? = null
         var errorTiempo: String? = null
@@ -38,11 +46,20 @@ class AddRecipeViewModel : ViewModel() {
         }
 
         if (hasError) {
-            _saveResult.value = SaveResult(errorNombre = errorNombre, errorTiempo = errorTiempo)
-        } else {
-            // TODO: Logic to save recipe (e.g., to Firebase)
-            _saveResult.value = SaveResult(success = true)
+            _uiState.value = UiState(
+                errorNombre = errorNombre,
+                errorTiempo = errorTiempo
+            )
+            return
+        }
 
+        // Sin errores — activa guardando para deshabilitar el botón
+        viewModelScope.launch {
+            _uiState.value = UiState(guardando = true)
+
+            // TODO: aquí irá la llamada real a Firebase
+            // Por ahora simula la operación exitosa
+            _uiState.value = UiState(success = true, guardando = false)
         }
     }
 }
