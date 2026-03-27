@@ -10,6 +10,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.progweb.recipify.databinding.ActivityRegisterBinding
+import com.progweb.recipify.home.HomeFragment
 import com.progweb.recipify.viewmodel.RegisterViewModel
 import kotlinx.coroutines.launch
 
@@ -59,6 +60,8 @@ class RegisterActivity : AppCompatActivity() {
                             "Usuario ${result.usuario} registrado correctamente",
                             Toast.LENGTH_LONG
                         ).show()
+                        startActivity(Intent(this@RegisterActivity, HomePage::class.java))
+                        finish()
                     }
                 }
             }
