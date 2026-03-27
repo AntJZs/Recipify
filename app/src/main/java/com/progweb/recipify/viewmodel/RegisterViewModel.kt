@@ -4,11 +4,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.progweb.recipify.com.progweb.recipify.datamodels.UsuariosManager
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 class RegisterViewModel : ViewModel() {
 
-    private val _registerState = MutableLiveData<RegisterResult>()
-    val registerState: LiveData<RegisterResult> = _registerState
+    private val _registerState = MutableStateFlow(RegisterResult())
+    val registerState: StateFlow<RegisterResult> = _registerState
 
     data class RegisterResult(
         val success: Boolean = false,

@@ -3,10 +3,15 @@ package com.progweb.recipify
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.result.launch
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.progweb.recipify.databinding.ActivityRegisterBinding
 import com.progweb.recipify.viewmodel.RegisterViewModel
+import kotlinx.coroutines.launch
 
 class RegisterActivity : AppCompatActivity() {
 
@@ -29,7 +34,7 @@ class RegisterActivity : AppCompatActivity() {
             val apellido = binding.etLastname.text.toString().trim()
             val password = binding.etPassword.text.toString()
             val confPassword = binding.etConfPassword.text.toString()
-            
+
             viewModel.register(usuario, nombre, apellido, password, confPassword)
         }
 
@@ -40,24 +45,22 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun setupObservers() {
-        viewModel.registerState.observe(this) { result ->
-            binding.tilUsuario.error = result.errorUsuario
-            binding.tilName.error = result.errorNombre
-            binding.tilLastname.error = result.errorApellido
-            binding.tilPassword.error = result.errorPassword
-            binding.confPassword.error = result.errorConfPassword
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.registerState.collect { result ->
+                    binding.tilUsuario.error = result.errorUsuario
+                    binding.tilName.error = result.errorNombre
+                    binding.tilLastname.error = result.errorApellido
+                    binding.tilPassword.error = result.errorPassword
 
-            if (result.success) {
-                Toast.makeText(
-                    this,
-                    "Usuario ${result.usuario} registrado correctamente",
-                    Toast.LENGTH_LONG
-                ).show()
-
-                val intent = Intent(this, HomePage::class.java)
-                intent.putExtra("usuario", result.usuario)
-                startActivity(intent)
-                finish()
+                    if (result.success) {
+                        Toast.makeText(
+                            this@RegisterActivity,
+                            "Usuario ${result.usuario} registrado correctamente",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
             }
         }
     }
