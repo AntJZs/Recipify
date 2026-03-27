@@ -3,7 +3,10 @@
 > Para esta sección, se contextualiza que el único flujo en nuestro programa que hasta el momento tiene los requerimientos solicitados en esta actividad es el de [AddRecipe.kt](https://github.com/AntJZs/Recipify/blob/main/app/src/main/java/com/progweb/recipify/addRecipe/AddRecipe.kt) , por lo tanto, se va a aplicar este ejemplo a los archivos de nuestro proyecto [RegisterViewModel.kt](https://github.com/AntJZs/Recipify/blob/main/app/src/main/java/com/progweb/recipify/viewmodel/AddRecipeViewModel.kt) y [AddRecipe.kt](https://github.com/AntJZs/Recipify/blob/main/app/src/main/java/com/progweb/recipify/addRecipe/AddRecipe.kt)    
 
 ## Capturas de pantalla
-![imagen1](static/imagen1.gif)
+![animacion1](static/imagen1.gif)
+![animacion2](static/sc2.gif)
+![img_landscape](static/ss1.jpg)
+![img_portrait](static/ss2.jpg)
     
 ## ¿Dónde vive el estado?
 En `_uiState = MutableStateFlow(UiState())` dentro del ViewModel. El Fragment/Activity no tiene ninguna variable de estado propia.
