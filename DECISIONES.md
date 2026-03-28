@@ -1,6 +1,6 @@
 # Entregable - Uso del patrón MVVM y StateFlow dentro del proyecto
 
-> Para esta sección, se contextualiza que el único flujo en nuestro programa que hasta el momento tiene los requerimientos solicitados en esta actividad es el de [AddRecipe.kt](https://github.com/AntJZs/Recipify/blob/main/app/src/main/java/com/progweb/recipify/addRecipe/AddRecipe.kt) , por lo tanto, se va a aplicar este ejemplo a los archivos de nuestro proyecto [RegisterViewModel.kt](https://github.com/AntJZs/Recipify/blob/main/app/src/main/java/com/progweb/recipify/viewmodel/AddRecipeViewModel.kt) y [AddRecipe.kt](https://github.com/AntJZs/Recipify/blob/main/app/src/main/java/com/progweb/recipify/addRecipe/AddRecipe.kt)    
+> Para esta sección, se contextualiza que el único flujo en nuestro programa que hasta el momento tiene los requerimientos solicitados en esta actividad es el de [AddRecipe.kt](https://github.com/AntJZs/Recipify/blob/main/app/src/main/java/com/progweb/recipify/addRecipe/AddRecipe.kt), por lo tanto, se va a aplicar este ejemplo a los archivos de nuestro proyecto [RegisterViewModel.kt](https://github.com/AntJZs/Recipify/blob/main/app/src/main/java/com/progweb/recipify/viewmodel/AddRecipeViewModel.kt) y [AddRecipe.kt](https://github.com/AntJZs/Recipify/blob/main/app/src/main/java/com/progweb/recipify/addRecipe/AddRecipe.kt)    
 
 ## Capturas de pantalla
 ![animacion1](static/imagen1.gif)
@@ -35,15 +35,14 @@ binding.btnGuardar.isEnabled = !estado.guardando  // botón deshabilitado visual
 
 ## Primera Decisión
 
-Incialmente implementamos Observer con LiveData pero dado el ejercicio, la necesidad del manejo de un código más limpio, evitar valores nulos y un mejor manejo de estados decidimos migrar a StateFlow con repeatOnLifecycle(Lifecycle.State.STARTED), esto ayudó a controlar mejor el envío de información evitando el gasto de recursos cuando la app se encuentra en segundo plano pero retomando su funcionamiento cuando nos encontramos dentro de ella, esto traduce en mayor rendimiento y control sobre los datos y mayor flexibilidad en el manejo de esto
+Inicialmente, implementamos Observer con LiveData, pero dado el ejercicio, la necesidad del manejo de un código más limpio, evitar valores nulos y un mejor manejo de estados decidimos migrar a StateFlow con `repeatOnLifecycle(Lifecycle.State.STARTED)`. Esto ayudó a controlar mejor el envío de información evitando el gasto de recursos cuando la app se encuentra en segundo plano, pero retomando su funcionamiento cuando nos encontramos dentro de ella, esto traduce en mayor rendimiento y control sobre los datos y mayor flexibilidad en el manejo de esto
 
 ## Segunda Decisión
-Al desarrollar el código tuvimos que separar los estados de forma que cada uno fuera un LiveData, pero al incorporar un Un único UiState como data class con todos los campos, expuesto como StateFlow evitamos problemas de sincronización pues si el ViewModel emite dos cambios seguidos (primero limpia errores, luego marca success), la UI puede recibir dos eventos separados y parpadear. Con un único UiState, cada vez que el ViewModel emite, la UI recibe el estado completo y consistente de una sola vez. 
-Además tenemos mayor facilidad para agregar campos nuevos (Estados) sin tocar la interfaz pública del ViewModel.
+Al desarrollar el código tuvimos que separar los estados de forma que cada uno fuera un LiveData, pero al incorporar un único UiState como data class con todos los campos, expuesto como StateFlow evitamos problemas de sincronización, por lo tanto, si el ViewModel emite dos cambios seguidos (primero limpia errores, luego marca success), la UI puede recibir dos eventos separados y parpadear. Con un único UiState, cada vez que el ViewModel emite, la UI recibe el estado completo y consistente de una sola vez, además tenemos mayor facilidad para agregar campos nuevos (Estados) sin tocar la interfaz pública del ViewModel.
 
 ## Tercera Decisión
 
-Primeramente no pensamos en ¿qué pasaría si el usuario diera doble click al botón de guardar? entonces nos dimos cuenta que es un caso bastante común, más aún si la respuesta de la plataforma es lenta o el flujo se ve interrumpido por esto decidimos agregar: 
+Primeramente, no pensamos en ¿qué pasaría si el usuario diera doble clic al botón de guardar? Entonces nos dimos cuenta de que es un caso bastante común, más aún si la respuesta de la plataforma es lenta o el flujo se ve interrumpido por esto decidimos agregar: 
 ```kotlin
 guardando: Boolean
 ```
@@ -52,9 +51,9 @@ El campo "guardando" en el UiState actúa como semáforo — el ViewModel lo act
 
 ## Cuarta Decisión
 
-![Registro](static\registro.gif)
+![Registro](static/registro.gif)
 
-Actualmente el registro se guarda durante el tiempo de ejecución de la app debido a que al momento de desarrollar dimos foco al guardado de recetas no tanto al de los usuarios, por lo que por ahora, el usuario se registra y se guarda en un objeto tipo data class:
+Actualmente, el registro se guarda durante el tiempo de ejecución de la app debido a que al momento de desarrollar dimos foco al guardado de recetas no tanto al de los usuarios, por lo que por ahora, el usuario se registra y se guarda en un objeto tipo data class:
 
 ```kotlin
 data class Usuario(
@@ -127,7 +126,7 @@ fun register(usuario: String, nombre: String, apellido: String, password: String
 ```
 Si el nuevo registro comparte nombre de usuario, nombre, apellido, hay campos vacíos o contraseñas con longitud menor a 6 el registro no se realizará hasta que estos hayan cambiado.
 
-![Validaciones](static\validaciones.gif)
+![Validaciones](static/validaciones.gif)
 
 Y se maneja StateFlow en:
 
