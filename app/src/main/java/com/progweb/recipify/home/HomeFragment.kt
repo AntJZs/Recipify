@@ -92,7 +92,21 @@ class HomeFragment : Fragment() {
             // TODO: navegar al detalle de la receta
         }
         binding.rvRecetas.adapter = adapter
-        binding.rvRecetas.layoutManager = GridLayoutManager(requireContext(), 2)
+        val layoutManager = GridLayoutManager(requireContext(), 2)
+        binding.rvRecetas.layoutManager = layoutManager
+
+        // Importante: Como el RecyclerView está dentro de un NestedScrollView,
+        // el scroll lo maneja el contenedor padre.
+        binding.nsvHome.setOnScrollChangeListener { v: androidx.core.widget.NestedScrollView, _, scrollY, _, _ ->
+            // Comprobar si hemos llegado al final del NestedScrollView
+            val lastChild = v.getChildAt(v.childCount - 1)
+            if (lastChild != null) {
+                // Si faltan menos de 200px para el final, cargamos más
+                if (scrollY >= (lastChild.measuredHeight - v.measuredHeight - 200)) {
+                    viewModel.cargarMasRecetas()
+                }
+            }
+        }
     }
 
     private fun observarViewModel() {

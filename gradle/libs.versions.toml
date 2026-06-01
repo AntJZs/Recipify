@@ -12,6 +12,9 @@ navigationFragmentKtx = "2.9.7"
 navigationUiKtx = "2.9.7"
 googlePlayServicesAuth = "21.3.0"
 firebaseBom = "34.10.0"
+retrofit = "2.9.0"
+gson = "2.10.1"
+converterGson = "2.9.0"
 
 
 [libraries]
@@ -29,6 +32,9 @@ google-play-services-auth = { group = "com.google.android.gms", name = "play-ser
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore" }
+retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
+converter-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "converterGson" }
+gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 
 
 [plugins]
