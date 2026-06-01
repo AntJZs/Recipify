@@ -1,6 +1,7 @@
 package com.progweb.recipify.datamodels
 
 import com.google.firebase.firestore.PropertyName
+import java.io.Serializable
 
 data class Recipe(
     @get:PropertyName("name") @set:PropertyName("name")
@@ -18,5 +19,11 @@ data class Recipe(
     @get:PropertyName("imageURL") @set:PropertyName("imageURL")
     var imageURL: String = "",
 
-    var id: String = "" // Firestore document ID
-)
+    @get:PropertyName("ingredients") @set:PropertyName("ingredients")
+    var ingredients: List<String> = emptyList(),
+
+    @get:PropertyName("area") @set:PropertyName("area")
+    var area: String = "",
+
+    var id: String = ""
+) : Serializable

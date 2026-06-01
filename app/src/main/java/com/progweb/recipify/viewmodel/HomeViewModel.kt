@@ -88,17 +88,6 @@ class HomeViewModel : ViewModel() {
         }
     }
 
-    private fun Meal.toRecipe(): Recipe {
-        return Recipe(
-            name = strMeal,
-            totalTimeMinutes = 25, // Default time as API doesn't provide it
-            category = listOf(strCategory),
-            description = strInstructions,
-            imageURL = strMealThumb,
-            id = "api_$idMeal"
-        )
-    }
-
     private fun fetchRecipesFromFirestore() {
         db.collection("recipe")
             .addSnapshotListener { value, error ->

@@ -45,15 +45,4 @@ class SearchViewModel : ViewModel() {
             }
         }
     }
-
-    private fun Meal.toRecipe(): Recipe {
-        return Recipe(
-            name = strMeal,
-            totalTimeMinutes = 25,
-            category = listOf(strCategory),
-            description = strInstructions,
-            imageURL = strMealThumb,
-            id = "api_$idMeal"
-        )
-    }
 }

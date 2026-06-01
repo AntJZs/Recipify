@@ -89,7 +89,9 @@ class HomeFragment : Fragment() {
     }
     private fun configurarRecyclerView() {
         adapter = RecipeAdapter { recipe ->
-            // TODO: navegar al detalle de la receta
+            val intent = Intent(requireContext(), com.progweb.recipify.recipeDetail.RecipeDetailActivity::class.java)
+            intent.putExtra("RECIPE", recipe)
+            startActivity(intent)
         }
         binding.rvRecetas.adapter = adapter
         val layoutManager = GridLayoutManager(requireContext(), 2)

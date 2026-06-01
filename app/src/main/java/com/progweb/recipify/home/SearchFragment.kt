@@ -39,7 +39,9 @@ class SearchFragment : Fragment() {
 
     private fun configurarRecyclerView() {
         adapter = RecipeAdapter { recipe ->
-            // TODO: navegar al detalle de la receta
+            val intent = android.content.Intent(requireContext(), com.progweb.recipify.recipeDetail.RecipeDetailActivity::class.java)
+            intent.putExtra("RECIPE", recipe)
+            startActivity(intent)
         }
         binding.rvSearchResults.adapter = adapter
         binding.rvSearchResults.layoutManager = GridLayoutManager(requireContext(), 2)
