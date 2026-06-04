@@ -16,12 +16,21 @@ class LoadingActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_loading)
 
-        viewModel.navigateToNext.observe(this) { navigate ->
-            if (navigate) {
-                val intent = Intent(this, Destacados::class.java)
-                startActivity(intent)
-                finish()
+        viewModel.navigationTarget.observe(this) { targetActivity ->
+            if (targetActivity == HomePage::class.java) {
+                val prefs = getSharedPreferences("user_session", MODE_PRIVATE)
+                val isLogged = prefs.getBoolean("isLogged", false)
+                if (!isLogged) {
+                    val currentUser = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser
+                    prefs.edit()
+                        .putBoolean("isLogged", true)
+                        .putString("usuario", currentUser?.displayName ?: currentUser?.email)
+                        .apply()
+                }
             }
+            val intent = Intent(this, targetActivity)
+            startActivity(intent)
+            finish()
         }
     }
 }

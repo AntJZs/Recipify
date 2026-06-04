@@ -33,6 +33,10 @@
             android:name=".HomePage"
             android:exported="false" />
         <activity
+            android:name=".ProfileSetupActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
             android:name=".LoginActivity"
             android:exported="true">
         </activity>

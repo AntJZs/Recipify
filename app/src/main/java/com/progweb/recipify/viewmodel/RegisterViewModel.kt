@@ -1,20 +1,28 @@
 package com.progweb.recipify.viewmodel
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.progweb.recipify.com.progweb.recipify.datamodels.UsuariosManager
+import androidx.lifecycle.viewModelScope
+import com.google.firebase.Timestamp
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import com.progweb.recipify.com.progweb.recipify.datamodels.UsuariosManager
 
 class RegisterViewModel : ViewModel() {
 
+    private val auth = FirebaseAuth.getInstance()
+    private val db = FirebaseFirestore.getInstance()
     private val _registerState = MutableStateFlow(RegisterResult())
     val registerState: StateFlow<RegisterResult> = _registerState
 
     data class RegisterResult(
         val success: Boolean = false,
         val usuario: String? = null,
+        val errorMessage: String? = null,
+        val errorEmail: String? = null,
         val errorUsuario: String? = null,
         val errorNombre: String? = null,
         val errorApellido: String? = null,
@@ -22,32 +30,31 @@ class RegisterViewModel : ViewModel() {
         val errorConfPassword: String? = null
     )
 
-    fun register(usuario: String, nombre: String, apellido: String, password: String, confPassword: String) {
+    fun register(email: String, usuario: String, nombre: String, apellido: String, password: String, confPassword: String) {
         var hasError = false
+        var errorEmail: String? = null
         var errorUsuario: String? = null
         var errorNombre: String? = null
         var errorApellido: String? = null
         var errorPassword: String? = null
         var errorConfPassword: String? = null
 
+        if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            errorEmail = "Ingresa un correo válido"
+            hasError = true
+        }
         if (usuario.isEmpty()) {
             errorUsuario = "Ingresa un usuario"
             hasError = true
-        } else if (UsuariosManager.usuarios.containsKey(usuario)) {
-            errorUsuario = "El usuario ya existe"
-            hasError = true
         }
-
         if (nombre.isEmpty()) {
             errorNombre = "Ingresa tu nombre"
             hasError = true
         }
-
         if (apellido.isEmpty()) {
             errorApellido = "Ingresa tu apellido"
             hasError = true
         }
-
         if (password.isEmpty()) {
             errorPassword = "Ingresa una contraseña"
             hasError = true
@@ -55,7 +62,6 @@ class RegisterViewModel : ViewModel() {
             errorPassword = "Mínimo 6 caracteres"
             hasError = true
         }
-
         if (confPassword.isEmpty()) {
             errorConfPassword = "Confirma la contraseña"
             hasError = true
@@ -66,6 +72,7 @@ class RegisterViewModel : ViewModel() {
 
         if (hasError) {
             _registerState.value = RegisterResult(
+                errorEmail = errorEmail,
                 errorUsuario = errorUsuario,
                 errorNombre = errorNombre,
                 errorApellido = errorApellido,
@@ -73,9 +80,39 @@ class RegisterViewModel : ViewModel() {
                 errorConfPassword = errorConfPassword
             )
         } else {
-            val nuevoUsuario = UsuariosManager.Usuario(usuario, nombre, apellido, password)
-            UsuariosManager.usuarios[usuario] = nuevoUsuario
-            _registerState.value = RegisterResult(success = true, usuario = usuario)
+            viewModelScope.launch {
+                try {
+                    val authResult = auth.createUserWithEmailAndPassword(email, password).await()
+                    val uid = authResult.user?.uid ?: throw Exception("Error al obtener ID de usuario")
+                    
+                    val userData = mapOf(
+                        "username" to usuario,
+                        "displayName" to "$nombre $apellido",
+                        "firstName" to nombre,
+                        "lastName" to apellido,
+                        "email" to email,
+                        "photoURL" to "https://placehold.net/avatar.png",
+                        "bio" to "",
+                        "location" to mapOf("country" to "Colombia", "city" to ""),
+                        "isVerified" to false,
+                        "role" to "user",
+                        "followersCount" to 0,
+                        "followingCount" to 0,
+                        "bookmarksCount" to 0,
+                        "createdAt" to Timestamp.now(),
+                        "updatedAt" to Timestamp.now()
+                    )
+                    
+                    db.collection("users").document(uid).set(userData).await()
+
+                    val nuevoUsuario = UsuariosManager.Usuario(usuario, nombre, apellido, password)
+                    UsuariosManager.usuarios[usuario] = nuevoUsuario
+                    
+                    _registerState.value = RegisterResult(success = true, usuario = usuario)
+                } catch (e: Exception) {
+                    _registerState.value = RegisterResult(errorMessage = "Error en el registro: ${e.message}")
+                }
+            }
         }
     }
 }

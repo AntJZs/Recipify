@@ -30,13 +30,14 @@ class RegisterActivity : AppCompatActivity() {
 
     private fun setupListeners() {
         binding.btnCrear.setOnClickListener {
+            val email = binding.etEmail.text.toString().trim()
             val usuario = binding.etUsuario.text.toString().trim()
             val nombre = binding.etName.text.toString().trim()
             val apellido = binding.etLastname.text.toString().trim()
             val password = binding.etPassword.text.toString()
             val confPassword = binding.etConfPassword.text.toString()
 
-            viewModel.register(usuario, nombre, apellido, password, confPassword)
+            viewModel.register(email, usuario, nombre, apellido, password, confPassword)
         }
 
         binding.tvLogin.setOnClickListener {
@@ -50,9 +51,14 @@ class RegisterActivity : AppCompatActivity() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.registerState.collect { result ->
                     binding.tilUsuario.error = result.errorUsuario
+                    binding.tilEmail.error = result.errorEmail
                     binding.tilName.error = result.errorNombre
                     binding.tilLastname.error = result.errorApellido
                     binding.tilPassword.error = result.errorPassword
+                    
+                    result.errorMessage?.let {
+                        Toast.makeText(this@RegisterActivity, it, Toast.LENGTH_LONG).show()
+                    }
 
                     if (result.success) {
                         Toast.makeText(
@@ -60,7 +66,9 @@ class RegisterActivity : AppCompatActivity() {
                             "Usuario ${result.usuario} registrado correctamente",
                             Toast.LENGTH_LONG
                         ).show()
-                        startActivity(Intent(this@RegisterActivity, HomePage::class.java))
+                        val intent = Intent(this@RegisterActivity, ProfileSetupActivity::class.java)
+                        intent.putExtra("usuario", result.usuario)
+                        startActivity(intent)
                         finish()
                     }
                 }

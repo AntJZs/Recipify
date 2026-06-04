@@ -42,6 +42,27 @@ class HomeFragment : Fragment() {
         configurarFab()
         observarViewModel()
         configurarMenu() // 👈 AQUÍ agregamos el menú
+        cargarAvatarUsuario()
+    }
+
+    private fun cargarAvatarUsuario() {
+        val currentUser = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser
+        if (currentUser != null) {
+            val db = com.google.firebase.firestore.FirebaseFirestore.getInstance()
+            db.collection("users").document(currentUser.uid).get()
+                .addOnSuccessListener { doc ->
+                    if (doc != null && doc.exists()) {
+                        val photoURL = doc.getString("photoURL")
+                        if (!photoURL.isNullOrEmpty() && _binding != null) {
+                            com.bumptech.glide.Glide.with(this)
+                                .load(photoURL)
+                                .placeholder(R.drawable.input_page_01)
+                                .error(R.drawable.input_page_01)
+                                .into(binding.ivAvatar)
+                        }
+                    }
+                }
+        }
     }
 
     // 🔧 CONFIGURAR POPUP MENU
@@ -78,6 +99,9 @@ class HomeFragment : Fragment() {
         }
     }
     private fun cerrarSesion() {
+        // Sign out from Firebase Auth
+        com.google.firebase.auth.FirebaseAuth.getInstance().signOut()
+
         val prefs = requireActivity().getSharedPreferences("user_session", android.content.Context.MODE_PRIVATE)
         prefs.edit().clear().apply()
 

@@ -86,15 +86,22 @@ class LoginActivity : AppCompatActivity() {
             }
 
             if (result.success) {
-                val prefs = getSharedPreferences("user_session", MODE_PRIVATE)
-                prefs.edit()
-                    .putBoolean("isLogged", true)
-                    .putString("usuario", result.usuario)
-                    .apply()
-                val intent = Intent(this, HomePage::class.java)
-                intent.putExtra("usuario", result.usuario)
-                startActivity(intent)
-                finish()
+                if (result.needsProfileSetup) {
+                    val intent = Intent(this, ProfileSetupActivity::class.java)
+                    intent.putExtra("usuario", result.usuario)
+                    startActivity(intent)
+                    finish()
+                } else {
+                    val prefs = getSharedPreferences("user_session", MODE_PRIVATE)
+                    prefs.edit()
+                        .putBoolean("isLogged", true)
+                        .putString("usuario", result.usuario)
+                        .apply()
+                    val intent = Intent(this, HomePage::class.java)
+                    intent.putExtra("usuario", result.usuario)
+                    startActivity(intent)
+                    finish()
+                }
             }
         }
     }

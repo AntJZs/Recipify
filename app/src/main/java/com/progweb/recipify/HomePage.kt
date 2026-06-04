@@ -31,6 +31,28 @@ class HomePage : AppCompatActivity() {
             return
         }
 
+        // Firebase Auth Verification Gate
+        val currentUser = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser
+        if (currentUser != null) {
+            val db = com.google.firebase.firestore.FirebaseFirestore.getInstance()
+            db.collection("users").document(currentUser.uid).get()
+                .addOnSuccessListener { doc ->
+                    if (doc != null && doc.exists()) {
+                        val isVerified = doc.getBoolean("isVerified") ?: false
+                        if (!isVerified) {
+                            val intent = Intent(this, ProfileSetupActivity::class.java)
+                            startActivity(intent)
+                            finish()
+                        }
+                    } else {
+                        // Document doesn't exist yet, force setup
+                        val intent = Intent(this, ProfileSetupActivity::class.java)
+                        startActivity(intent)
+                        finish()
+                    }
+                }
+        }
+
         binding = ActivityHomePageBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
