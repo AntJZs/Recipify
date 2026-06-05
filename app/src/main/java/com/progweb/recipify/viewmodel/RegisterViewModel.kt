@@ -96,8 +96,6 @@ class RegisterViewModel : ViewModel() {
                         "location" to mapOf("country" to "Colombia", "city" to ""),
                         "isVerified" to false,
                         "role" to "user",
-                        "followersCount" to 0,
-                        "followingCount" to 0,
                         "bookmarksCount" to 0,
                         "createdAt" to Timestamp.now(),
                         "updatedAt" to Timestamp.now()

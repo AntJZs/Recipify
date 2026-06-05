@@ -53,6 +53,24 @@ class ProfileFragment : Fragment() {
         binding.btnProfileLogout.setOnClickListener {
             cerrarSesion()
         }
+
+        var avatarClickCount = 0
+        var lastClickTime: Long = 0
+        binding.ivProfileAvatar.setOnClickListener {
+            val currentTime = System.currentTimeMillis()
+            if (currentTime - lastClickTime < 1500) {
+                avatarClickCount++
+            } else {
+                avatarClickCount = 1
+            }
+            lastClickTime = currentTime
+
+            if (avatarClickCount >= 5) {
+                avatarClickCount = 0
+                val intent = Intent(requireContext(), com.progweb.recipify.JsonRecipeImportActivity::class.java)
+                startActivity(intent)
+            }
+        }
     }
 
     private fun cargarDatosUsuario() {
@@ -81,8 +99,6 @@ class ProfileFragment : Fragment() {
                     val country = locationMap?.get("country") as? String ?: "Colombia"
                     val locationStr = if (city.isNotEmpty()) "$city, $country" else country
 
-                    val followers = doc.getLong("followersCount") ?: 0
-                    val following = doc.getLong("followingCount") ?: 0
                     val bookmarks = doc.getLong("bookmarksCount") ?: 0
 
                     binding.tvProfileDisplayName.text = if (displayName.isNotEmpty()) displayName else currentUser.displayName ?: "Recipifyer"
@@ -90,8 +106,6 @@ class ProfileFragment : Fragment() {
                     binding.tvProfileBio.text = if (bio.isNotEmpty()) bio else "Este usuario no ha agregado una biografía."
                     binding.tvProfileLocation.text = locationStr
 
-                    binding.tvFollowersCount.text = followers.toString()
-                    binding.tvFollowingCount.text = following.toString()
                     binding.tvBookmarksCount.text = bookmarks.toString()
 
                     if (photoURL.isNotEmpty()) {

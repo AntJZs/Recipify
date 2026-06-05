@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/colorSurface"
+    tools:context=".JsonRecipeImportActivity">
+
+    <!-- App Bar -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorSurface"
+        app:elevation="0dp"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:title="Importador JSON de Recetas"
+            app:titleCentered="true"
+            app:navigationIcon="@drawable/ic_back"
+            app:titleTextAppearance="?attr/textAppearanceTitleLarge" />
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- Scrollable container for text box -->
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_margin="16dp"
+        app:strokeWidth="1dp"
+        app:strokeColor="?attr/colorOutlineVariant"
+        app:cardCornerRadius="12dp"
+        app:layout_constraintTop_toBottomOf="@id/appBar"
+        app:layout_constraintBottom_toTopOf="@id/btnImportJson"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etJsonInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Pegue aquí el JSON de la receta...\n\nSoporta un objeto único o un arreglo de objetos [ { ... } ]"
+                android:gravity="top|start"
+                android:padding="16dp"
+                android:background="@android:color/transparent"
+                android:textAppearance="?attr/textAppearanceBodyMedium"
+                android:inputType="textMultiLine"
+                android:scrollbars="vertical" />
+        </ScrollView>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Import Button -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnImportJson"
+        android:layout_width="0dp"
+        android:layout_height="52dp"
+        android:layout_margin="16dp"
+        android:text="Importar a Firestore"
+        android:textAppearance="?attr/textAppearanceLabelLarge"
+        app:cornerRadius="24dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

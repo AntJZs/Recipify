@@ -64,7 +64,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="32dp"
-            android:hint="Categoría (todas, rapidas, postres, vegano)">
+            android:hint="Categorías (separadas por comas, ej: postre, galleta)">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etCategoria"
@@ -73,6 +73,69 @@
                 android:inputType="text"
                 android:imeOptions="actionDone" />
         </com.google.android.material.textfield.TextInputLayout>
+
+<!-- Markdown Toolbar -->
+<LinearLayout
+    android:id="@+id/markdownToolbar"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="8dp">
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnBold"
+        style="@style/Widget.Material3.Button.TextButton"
+        android:text="B"
+        android:textStyle="bold" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnItalic"
+        style="@style/Widget.Material3.Button.TextButton"
+        android:text="I"
+        android:textStyle="italic" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnH1"
+        style="@style/Widget.Material3.Button.TextButton"
+        android:text="H1" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnH2"
+        style="@style/Widget.Material3.Button.TextButton"
+        android:text="H2" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnList"
+        style="@style/Widget.Material3.Button.TextButton"
+        android:text="List" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnLink"
+        style="@style/Widget.Material3.Button.TextButton"
+        android:text="Link" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnImage"
+        style="@style/Widget.Material3.Button.TextButton"
+        android:text="Img" />
+</LinearLayout>
+
+<!-- Body -->
+<com.google.android.material.textfield.TextInputLayout
+    android:id="@+id/tilBody"
+    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:hint="Receta (markdown)">
+
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/etBody"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:gravity="top"
+        android:inputType="textMultiLine"
+        android:imeOptions="actionDone" />
+</com.google.android.material.textfield.TextInputLayout>
 
         <!-- Botón Guardar -->
         <com.google.android.material.button.MaterialButton

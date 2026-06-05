@@ -20,11 +20,36 @@ data class Recipe(
     var imageURL: String = "",
 
     @get:PropertyName("ingredients") @set:PropertyName("ingredients")
-    var ingredients: List<String> = emptyList(),
+    var ingredients: List<Any> = emptyList(),
 
     @get:PropertyName("area") @set:PropertyName("area")
     var area: String = "",
 
-    var id: String = "",
-    var isBookmarked: Boolean = false
-) : Serializable
+    @get:PropertyName("body") @set:PropertyName("body")
+    var body: String = "",
+
+    @get:PropertyName("userId") @set:PropertyName("userId")
+    var userId: String = "",
+
+    var isBookmarked: Boolean = false,
+    var id: String = ""
+) : Serializable {
+
+    fun getFormattedIngredients(): List<String> {
+        return ingredients.map { item ->
+            when (item) {
+                is String -> item
+                is Map<*, *> -> {
+                    val quantity = item["quantity"] as? String ?: ""
+                    val ingredient = item["ingredient"] as? String ?: ""
+                    if (quantity.isNotEmpty()) "$quantity $ingredient" else ingredient
+                }
+                else -> item.toString()
+            }
+        }
+    }
+
+    fun getDisplayDescription(): String {
+        return if (body.isNotEmpty()) body else description
+    }
+}
