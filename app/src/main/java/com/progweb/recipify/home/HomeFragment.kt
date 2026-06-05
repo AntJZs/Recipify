@@ -112,11 +112,13 @@ class HomeFragment : Fragment() {
         requireActivity().finish()
     }
     private fun configurarRecyclerView() {
-        adapter = RecipeAdapter { recipe ->
-            val intent = Intent(requireContext(), com.progweb.recipify.recipeDetail.RecipeDetailActivity::class.java)
-            intent.putExtra("RECIPE", recipe)
-            startActivity(intent)
-        }
+        adapter = RecipeAdapter(
+            onItemClick = { recipe ->
+                val intent = Intent(requireContext(), com.progweb.recipify.recipeDetail.RecipeDetailActivity::class.java)
+                intent.putExtra("RECIPE", recipe)
+                startActivity(intent)
+            }
+        )
         binding.rvRecetas.adapter = adapter
         val layoutManager = GridLayoutManager(requireContext(), 2)
         binding.rvRecetas.layoutManager = layoutManager

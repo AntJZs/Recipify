@@ -140,4 +140,5 @@
     <color name="md_theme_surfaceContainer_highContrast">#F0DFD6</color>
     <color name="md_theme_surfaceContainerHigh_highContrast">#E1D1C8</color>
     <color name="md_theme_surfaceContainerHighest_highContrast">#D3C4BB</color>
+    <color name="bookmark_active_color">#FFD28E</color>
 </resources>

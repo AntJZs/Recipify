@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.progweb.recipify.datamodels.Recipe
 import com.progweb.recipify.network.Meal
@@ -19,6 +20,7 @@ class HomeViewModel : ViewModel() {
     private val _apiRecetas = MutableLiveData<List<Recipe>>(emptyList())
 
     private val _todasLasRecetas = MutableLiveData<List<Recipe>>()
+    val todasLasRecetas: LiveData<List<Recipe>> = _todasLasRecetas
 
     private var alfabetIndex = 0
     private val alfabeto = "abcdefghijklmnopqrstuvwxyz".map { it.toString() }
@@ -33,9 +35,24 @@ class HomeViewModel : ViewModel() {
     private val _categorias = MutableLiveData<List<String>>()
     val categorias: LiveData<List<String>> = _categorias
 
+    private val _bookmarkedRecipeIds = MutableLiveData<Set<String>>(emptySet())
+    val bookmarkedRecipeIds: LiveData<Set<String>> = _bookmarkedRecipeIds
+
     init {
+        fetchBookmarks()
         fetchRecipesFromFirestore()
         fetchInitialRecipes()
+    }
+
+    private fun fetchBookmarks() {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        db.collection("users").document(userId).collection("bookmarks")
+            .addSnapshotListener { value, error ->
+                if (error != null) return@addSnapshotListener
+                val ids = value?.documents?.map { it.id }?.toSet() ?: emptySet()
+                _bookmarkedRecipeIds.value = ids
+                combinarYActualizar()
+            }
     }
 
     private fun fetchInitialRecipes() {
@@ -115,7 +132,11 @@ class HomeViewModel : ViewModel() {
     private fun combinarYActualizar() {
         val firestore = _firestoreRecetas.value ?: emptyList()
         val api = _apiRecetas.value ?: emptyList()
-        val todas = firestore + api
+        val bookmarks = _bookmarkedRecipeIds.value ?: emptySet()
+
+        val todas = (firestore + api).map { recipe ->
+            recipe.copy(isBookmarked = bookmarks.contains(recipe.id))
+        }
         
         _todasLasRecetas.value = todas
         

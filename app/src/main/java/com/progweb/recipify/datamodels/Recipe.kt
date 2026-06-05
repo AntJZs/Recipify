@@ -25,5 +25,6 @@ data class Recipe(
     @get:PropertyName("area") @set:PropertyName("area")
     var area: String = "",
 
-    var id: String = ""
+    var id: String = "",
+    var isBookmarked: Boolean = false
 ) : Serializable

@@ -7,9 +7,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import com.progweb.recipify.databinding.FragmentSearchBinding
+import com.progweb.recipify.viewmodel.HomeViewModel
 import com.progweb.recipify.viewmodel.SearchViewModel
 
 class SearchFragment : Fragment() {
@@ -18,6 +20,7 @@ class SearchFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: SearchViewModel by viewModels()
+    private val homeViewModel: HomeViewModel by activityViewModels()
     private lateinit var adapter: RecipeAdapter
 
     override fun onCreateView(
@@ -38,11 +41,13 @@ class SearchFragment : Fragment() {
     }
 
     private fun configurarRecyclerView() {
-        adapter = RecipeAdapter { recipe ->
-            val intent = android.content.Intent(requireContext(), com.progweb.recipify.recipeDetail.RecipeDetailActivity::class.java)
-            intent.putExtra("RECIPE", recipe)
-            startActivity(intent)
-        }
+        adapter = RecipeAdapter(
+            onItemClick = { recipe ->
+                val intent = android.content.Intent(requireContext(), com.progweb.recipify.recipeDetail.RecipeDetailActivity::class.java)
+                intent.putExtra("RECIPE", recipe)
+                startActivity(intent)
+            }
+        )
         binding.rvSearchResults.adapter = adapter
         binding.rvSearchResults.layoutManager = GridLayoutManager(requireContext(), 2)
     }
@@ -58,8 +63,12 @@ class SearchFragment : Fragment() {
     }
 
     private fun observarViewModel() {
-        viewModel.searchResults.observe(viewLifecycleOwner) { recipes ->
-            adapter.submitList(recipes)
+        viewModel.searchResults.observe(viewLifecycleOwner) { searchResults ->
+            homeViewModel.recetasFiltradas.observe(viewLifecycleOwner) { todas ->
+                val searchIds = searchResults.map { it.id }.toSet()
+                val updatedResults = todas.filter { it.id in searchIds }
+                adapter.submitList(updatedResults)
+            }
         }
     }
 
