@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Guardar en: res/layout/item_receta.xml -->
 <androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -15,7 +14,6 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- Imagen opcional de la receta -->
         <ImageView
             android:id="@+id/ivRecetaItem"
             android:layout_width="match_parent"
@@ -23,7 +21,6 @@
             android:scaleType="centerCrop"
             android:background="?attr/colorSurfaceContainerHigh" />
 
-        <!-- Info de la receta -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -32,9 +32,7 @@ class RecipeAdapter(
             binding.tvNombreItem.text = recipe.name
             binding.tvTiempoItem.text = "${recipe.totalTimeMinutes} min"
 
-            // Se pone la imagen si existe en Firebase
             Glide.with(binding.root).load(recipe.imageURL).into(binding.ivRecetaItem)
-
 
             binding.root.setOnClickListener { onItemClick(recipe) }
         }
