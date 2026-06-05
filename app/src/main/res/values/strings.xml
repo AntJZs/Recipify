@@ -9,4 +9,5 @@
     <string name="recipe_saved">Receta guardada</string>
     <string name="recipe_removed">Receta eliminada de guardados</string>
     <string name="error_message_prefix">Error: %1$s</string>
+    <string name="msg_error_guardar_receta">Error al guardar la receta</string>
 </resources>
