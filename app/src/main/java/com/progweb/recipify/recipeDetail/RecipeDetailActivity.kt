@@ -104,7 +104,23 @@ class RecipeDetailActivity : AppCompatActivity() {
 
     private fun setupUI(recipe: Recipe) {
         binding.tvRecipeName.text = recipe.name
+
+        // Fetch authorName from Firestore if it exists in the object
+        val authorText = if (recipe.userId.isNotEmpty()) {
+            // Check if authorName is already in the object (it should be now)
+            // But if it's an old recipe or we want to be sure, we could fetch it
+            // For now, let's assume it's in the Recipe object or fetch it from firestore
+            "por ${recipe.userId}" // Fallback
+        } else {
+            ""
+        }
         
+        // Let's try to get authorName from the document if available
+        db.collection("recipe").document(recipe.id).get().addOnSuccessListener { doc ->
+            val author = doc.getString("authorName") ?: "Usuario"
+            binding.tvAuthorName.text = "por $author"
+        }
+
         // Simple Markdown parsing for ## Title, ### Subtitle
         val formattedBody = parseMarkdown(recipe.getDisplayDescription())
         binding.tvInstructions.text = formattedBody
