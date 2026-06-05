@@ -75,50 +75,70 @@
         </com.google.android.material.textfield.TextInputLayout>
 
 <!-- Markdown Toolbar -->
-<LinearLayout
-    android:id="@+id/markdownToolbar"
-    android:orientation="horizontal"
+<HorizontalScrollView
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="8dp">
+    android:layout_marginBottom="8dp"
+    android:scrollbars="none">
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnBold"
-        style="@style/Widget.Material3.Button.TextButton"
-        android:text="B"
-        android:textStyle="bold" />
+    <LinearLayout
+        android:id="@+id/markdownToolbar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnItalic"
-        style="@style/Widget.Material3.Button.TextButton"
-        android:text="I"
-        android:textStyle="italic" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnBold"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="B"
+            android:textStyle="bold" />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnH1"
-        style="@style/Widget.Material3.Button.TextButton"
-        android:text="H1" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnItalic"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="I"
+            android:textStyle="italic" />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnH2"
-        style="@style/Widget.Material3.Button.TextButton"
-        android:text="H2" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnH1"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="H1" />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnList"
-        style="@style/Widget.Material3.Button.TextButton"
-        android:text="List" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnH2"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="H2" />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnLink"
-        style="@style/Widget.Material3.Button.TextButton"
-        android:text="Link" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnList"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="List" />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnImage"
-        style="@style/Widget.Material3.Button.TextButton"
-        android:text="Img" />
-</LinearLayout>
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnNumberedList"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1." />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnImage"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Img" />
+    </LinearLayout>
+</HorizontalScrollView>
 
 <!-- Body -->
 <com.google.android.material.textfield.TextInputLayout

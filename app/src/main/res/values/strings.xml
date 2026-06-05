@@ -4,5 +4,9 @@
     <string name="ingrese_credenciales">Ingresa tus credenciales</string>
     <string name="msg_receta_guardada">Receta guardada correctamente</string>
     <string name="default_web_client_id">1023793139842-lbfnut6n059on7lt8ti6i9nliah0ammm.apps.googleusercontent.com</string>
-
+    <string name="general">General</string>
+    <string name="no_ingredients_listed">No hay ingredientes listados</string>
+    <string name="recipe_saved">Receta guardada</string>
+    <string name="recipe_removed">Receta eliminada de guardados</string>
+    <string name="error_message_prefix">Error: %1$s</string>
 </resources>

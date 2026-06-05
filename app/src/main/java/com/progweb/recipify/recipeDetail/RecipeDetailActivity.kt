@@ -94,25 +94,53 @@ class RecipeDetailActivity : AppCompatActivity() {
             }.addOnSuccessListener { newBookmarkState ->
                 isBookmarked = newBookmarkState
                 updateBookmarkIcon()
-                val message = if (isBookmarked) "Receta guardada" else "Receta eliminada de guardados"
+                val message = if (isBookmarked) getString(R.string.recipe_saved) else getString(R.string.recipe_removed)
                 Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
             }.addOnFailureListener { e ->
-                Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.error_message_prefix, e.message), Toast.LENGTH_SHORT).show()
             }
         }
     }
 
     private fun setupUI(recipe: Recipe) {
         binding.tvRecipeName.text = recipe.name
-        binding.tvInstructions.text = recipe.getDisplayDescription()
+        
+        // Simple Markdown parsing for ## Title, ### Subtitle
+        val formattedBody = parseMarkdown(recipe.getDisplayDescription())
+        binding.tvInstructions.text = formattedBody
+
         binding.chipArea.text = recipe.area
-        binding.chipCategory.text = recipe.category.firstOrNull() ?: "General"
+        binding.chipCategory.text = recipe.category.firstOrNull() ?: getString(R.string.general)
         
         val ingredientsText = recipe.getFormattedIngredients().joinToString("\n") { "• $it" }
-        binding.tvIngredients.text = if (ingredientsText.isNotEmpty()) ingredientsText else "No hay ingredientes listados"
+        binding.tvIngredients.text = if (ingredientsText.isNotEmpty()) ingredientsText else getString(R.string.no_ingredients_listed)
 
         Glide.with(this)
             .load(recipe.imageURL)
             .into(binding.ivRecipeDetail)
+    }
+
+    private fun parseMarkdown(text: String): android.text.SpannableStringBuilder {
+        val ssb = android.text.SpannableStringBuilder(text)
+        
+        // Match ### Subtitle
+        val subtitleRegex = Regex("###\\s*(.*)")
+        subtitleRegex.findAll(text).forEach { match ->
+            val start = match.range.first
+            val end = match.range.last + 1
+            ssb.setSpan(android.text.style.StyleSpan(android.graphics.Typeface.BOLD), start, end, android.text.Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            ssb.setSpan(android.text.style.RelativeSizeSpan(1.2f), start, end, android.text.Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+        
+        // Match ## Title
+        val titleRegex = Regex("##\\s*(.*)")
+        titleRegex.findAll(text).forEach { match ->
+            val start = match.range.first
+            val end = match.range.last + 1
+            ssb.setSpan(android.text.style.StyleSpan(android.graphics.Typeface.BOLD), start, end, android.text.Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            ssb.setSpan(android.text.style.RelativeSizeSpan(1.4f), start, end, android.text.Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+        
+        return ssb
     }
 }

@@ -14,7 +14,8 @@ class AddRecipeViewModel : ViewModel() {
         val guardando: Boolean = false,       // controla el doble clic
         val success: Boolean = false,
         val errorNombre: String? = null,
-        val errorTiempo: String? = null
+        val errorTiempo: String? = null,
+        val errorBody: String? = null
     )
 
     // MutableStateFlow privado — solo el ViewModel puede modificarlo
@@ -23,7 +24,12 @@ class AddRecipeViewModel : ViewModel() {
     // StateFlow público — el Fragment solo puede leerlo
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
-    fun saveRecipe(nombre: String, tiempo: String) {
+    fun saveRecipe(
+        nombre: String,
+        tiempo: String,
+        categorias: String,
+        cuerpo: String
+    ) {
 
         // Evita doble clic — si ya está guardando, ignora la llamada
         if (_uiState.value.guardando) return
@@ -31,6 +37,7 @@ class AddRecipeViewModel : ViewModel() {
         var hasError = false
         var errorNombre: String? = null
         var errorTiempo: String? = null
+        var errorBody: String? = null
 
         if (nombre.trim().isEmpty()) {
             errorNombre = "Ingresa el nombre del plato"
@@ -45,10 +52,16 @@ class AddRecipeViewModel : ViewModel() {
             hasError = true
         }
 
+        if (cuerpo.trim().isEmpty()) {
+            errorBody = "Ingresa el cuerpo de la receta"
+            hasError = true
+        }
+
         if (hasError) {
             _uiState.value = UiState(
                 errorNombre = errorNombre,
-                errorTiempo = errorTiempo
+                errorTiempo = errorTiempo,
+                errorBody = errorBody
             )
             return
         }
@@ -57,8 +70,8 @@ class AddRecipeViewModel : ViewModel() {
         viewModelScope.launch {
             _uiState.value = UiState(guardando = true)
 
-            // TODO: aquí irá la llamada real a Firebase
-            // Por ahora simula la operación exitosa
+            // TODO: aquí irá la llamada real a Firebase (se hará en Activity)
+            // Simulación por ahora
             _uiState.value = UiState(success = true, guardando = false)
         }
     }
