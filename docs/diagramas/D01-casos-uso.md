@@ -2,6 +2,8 @@
 
 **Objetivo:** Representar de forma gráfica y estandarizada las interacciones entre los diferentes tipos de usuarios y las funcionalidades principales que ofrece el sistema Recipify, siguiendo el estándar clásico de diagramas UML de casos de uso (Actores Humanos -> Límite del Sistema -> Sistemas Externos).
 
+![Diagrama de casos de uso](D01-casos-uso.jpg)
+
 ## Diagrama de Casos de Uso (PlantUML)
 
 ```plantuml
