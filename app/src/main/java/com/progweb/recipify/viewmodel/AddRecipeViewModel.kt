@@ -1,42 +1,37 @@
 package com.progweb.recipify.viewmodel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 
 class AddRecipeViewModel : ViewModel() {
 
-    // UiState agrupa TODO el estado de la pantalla en un solo objeto
     data class UiState(
-        val guardando: Boolean = false,       // controla el doble clic
+        val guardando: Boolean = false,
         val success: Boolean = false,
         val errorNombre: String? = null,
         val errorTiempo: String? = null,
+        val errorIngredients: String? = null,
         val errorBody: String? = null
     )
 
-    // MutableStateFlow privado — solo el ViewModel puede modificarlo
     private val _uiState = MutableStateFlow(UiState())
-
-    // StateFlow público — el Fragment solo puede leerlo
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
     fun saveRecipe(
         nombre: String,
         tiempo: String,
         categorias: String,
+        ingredients: String,
         cuerpo: String
     ) {
-
-        // Evita doble clic — si ya está guardando, ignora la llamada
         if (_uiState.value.guardando) return
 
         var hasError = false
         var errorNombre: String? = null
         var errorTiempo: String? = null
+        var errorIngredients: String? = null
         var errorBody: String? = null
 
         if (nombre.trim().isEmpty()) {
@@ -52,8 +47,13 @@ class AddRecipeViewModel : ViewModel() {
             hasError = true
         }
 
+        if (ingredients.trim().isEmpty()) {
+            errorIngredients = "Ingresa al menos un ingrediente"
+            hasError = true
+        }
+
         if (cuerpo.trim().isEmpty()) {
-            errorBody = "Ingresa el cuerpo de la receta"
+            errorBody = "Ingresa los pasos de la receta"
             hasError = true
         }
 
@@ -61,18 +61,16 @@ class AddRecipeViewModel : ViewModel() {
             _uiState.value = UiState(
                 errorNombre = errorNombre,
                 errorTiempo = errorTiempo,
+                errorIngredients = errorIngredients,
                 errorBody = errorBody
             )
             return
         }
 
-        // Sin errores — activa guardando para deshabilitar el botón
-        viewModelScope.launch {
-            _uiState.value = UiState(guardando = true)
+        _uiState.value = UiState(guardando = true, success = true)
+    }
 
-            // TODO: aquí irá la llamada real a Firebase (se hará en Activity)
-            // Simulación por ahora
-            _uiState.value = UiState(success = true, guardando = false)
-        }
+    fun resetAfterFailure() {
+        _uiState.value = _uiState.value.copy(guardando = false, success = false)
     }
 }

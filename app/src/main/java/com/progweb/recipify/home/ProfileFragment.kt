@@ -8,13 +8,19 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import com.progweb.recipify.Destacados
 import com.progweb.recipify.ProfileSetupActivity
 import com.progweb.recipify.R
 import com.progweb.recipify.databinding.FragmentProfileBinding
+import com.progweb.recipify.databinding.ItemRecipeGridBinding
+import com.progweb.recipify.datamodels.Recipe
+import com.progweb.recipify.recipeDetail.RecipeDetailActivity
 
 class ProfileFragment : Fragment() {
 
@@ -23,6 +29,7 @@ class ProfileFragment : Fragment() {
 
     private val auth = FirebaseAuth.getInstance()
     private val db = FirebaseFirestore.getInstance()
+    private lateinit var recipeAdapter: UserRecipeAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -36,12 +43,26 @@ class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setupRecyclerView()
         setupListeners()
     }
 
     override fun onResume() {
         super.onResume()
         cargarDatosUsuario()
+        cargarRecetasUsuario()
+    }
+
+    private fun setupRecyclerView() {
+        recipeAdapter = UserRecipeAdapter { recipe ->
+            val intent = Intent(requireContext(), RecipeDetailActivity::class.java)
+            intent.putExtra("RECIPE", recipe)
+            startActivity(intent)
+        }
+        binding.rvUserRecipes.apply {
+            adapter = recipeAdapter
+            layoutManager = GridLayoutManager(requireContext(), 3)
+        }
     }
 
     private fun setupListeners() {
@@ -53,36 +74,15 @@ class ProfileFragment : Fragment() {
         binding.btnProfileLogout.setOnClickListener {
             cerrarSesion()
         }
-
-        var avatarClickCount = 0
-        var lastClickTime: Long = 0
-        binding.ivProfileAvatar.setOnClickListener {
-            val currentTime = System.currentTimeMillis()
-            if (currentTime - lastClickTime < 1500) {
-                avatarClickCount++
-            } else {
-                avatarClickCount = 1
-            }
-            lastClickTime = currentTime
-
-            if (avatarClickCount >= 5) {
-                avatarClickCount = 0
-                val intent = Intent(requireContext(), com.progweb.recipify.JsonRecipeImportActivity::class.java)
-                startActivity(intent)
-            }
-        }
     }
 
     private fun cargarDatosUsuario() {
         val currentUser = auth.currentUser
         if (currentUser == null) {
-            // Local mock user fallback
             val prefs = requireActivity().getSharedPreferences("user_session", Context.MODE_PRIVATE)
             val username = prefs.getString("usuario", "Usuario") ?: "Usuario"
             binding.tvProfileDisplayName.text = username
             binding.tvProfileUsername.text = "@$username"
-            binding.tvProfileBio.text = "Usuario local sin datos en la nube."
-            binding.tvProfileLocation.text = "Colombia"
             return
         }
 
@@ -91,21 +91,11 @@ class ProfileFragment : Fragment() {
                 if (doc != null && doc.exists() && _binding != null) {
                     val displayName = doc.getString("displayName") ?: ""
                     val username = doc.getString("username") ?: ""
-                    val bio = doc.getString("bio") ?: ""
                     val photoURL = doc.getString("photoURL") ?: ""
-                    
-                    val locationMap = doc.get("location") as? Map<*, *>
-                    val city = locationMap?.get("city") as? String ?: ""
-                    val country = locationMap?.get("country") as? String ?: "Colombia"
-                    val locationStr = if (city.isNotEmpty()) "$city, $country" else country
-
                     val bookmarks = doc.getLong("bookmarksCount") ?: 0
 
                     binding.tvProfileDisplayName.text = if (displayName.isNotEmpty()) displayName else currentUser.displayName ?: "Recipifyer"
                     binding.tvProfileUsername.text = if (username.isNotEmpty()) "@$username" else "@usuario"
-                    binding.tvProfileBio.text = if (bio.isNotEmpty()) bio else "Este usuario no ha agregado una biografía."
-                    binding.tvProfileLocation.text = locationStr
-
                     binding.tvBookmarksCount.text = bookmarks.toString()
 
                     if (photoURL.isNotEmpty()) {
@@ -118,22 +108,36 @@ class ProfileFragment : Fragment() {
                     }
                 }
             }
-            .addOnFailureListener { e ->
-                if (_binding != null) {
-                    Toast.makeText(requireContext(), "Error al cargar perfil: ${e.message}", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun cargarRecetasUsuario() {
+        val currentUser = auth.currentUser ?: return
+
+        db.collection("recipe")
+            .whereEqualTo("userId", currentUser.uid)
+            .orderBy("createdAt", Query.Direction.DESCENDING)
+            .get()
+            .addOnSuccessListener { result ->
+                if (_binding == null) return@addOnSuccessListener
+                
+                val recipes = result.documents.mapNotNull { doc ->
+                    doc.toObject(Recipe::class.java)?.apply { id = doc.id }
                 }
+                
+                recipeAdapter.submitList(recipes)
+                binding.tvRecipesCount.text = recipes.size.toString()
+            }
+            .addOnFailureListener { e ->
+                android.util.Log.e("ProfileFragment", "Error cargando recetas", e)
             }
     }
 
     private fun cerrarSesion() {
         auth.signOut()
-
         val prefs = requireActivity().getSharedPreferences("user_session", Context.MODE_PRIVATE)
         prefs.edit().clear().apply()
-
         val intent = Intent(requireActivity(), Destacados::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-
         startActivity(intent)
         requireActivity().finish()
     }
@@ -141,5 +145,36 @@ class ProfileFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    // Inner class Adapter for the grid
+    private class UserRecipeAdapter(private val onClick: (Recipe) -> Unit) :
+        RecyclerView.Adapter<UserRecipeAdapter.ViewHolder>() {
+
+        private var recipes = listOf<Recipe>()
+
+        fun submitList(newList: List<Recipe>) {
+            recipes = newList
+            notifyDataSetChanged()
+        }
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+            val binding = ItemRecipeGridBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            return ViewHolder(binding)
+        }
+
+        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+            val recipe = recipes[position]
+            Glide.with(holder.itemView.context)
+                .load(recipe.imageURL)
+                .placeholder(R.drawable.input_page_02)
+                .into(holder.binding.ivRecipeGrid)
+            
+            holder.itemView.setOnClickListener { onClick(recipe) }
+        }
+
+        override fun getItemCount() = recipes.size
+
+        class ViewHolder(val binding: ItemRecipeGridBinding) : RecyclerView.ViewHolder(binding.root)
     }
 }
