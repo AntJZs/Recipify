@@ -32,12 +32,8 @@ class Destacados : AppCompatActivity() {
     }
 
     private fun setupListeners() {
-        binding.btnRegistrarse.setOnClickListener {
-            viewModel.onRegisterClicked()
-        }
-        binding.btnIniciarSesion.setOnClickListener {
-            viewModel.onLoginClicked()
-        }
+        binding.btnRegistrarse.setOnClickListener { viewModel.onRegisterClicked() }
+        binding.btnIniciarSesion.setOnClickListener { viewModel.onLoginClicked() }
     }
 
     private fun setupObservers() {

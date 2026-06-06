@@ -6,17 +6,19 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.PopupMenu
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Query
 import com.progweb.recipify.Destacados
 import com.progweb.recipify.ProfileSetupActivity
 import com.progweb.recipify.R
+import com.progweb.recipify.addRecipe.AddRecipe
 import com.progweb.recipify.databinding.FragmentProfileBinding
 import com.progweb.recipify.databinding.ItemRecipeGridBinding
 import com.progweb.recipify.datamodels.Recipe
@@ -42,7 +44,6 @@ class ProfileFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         setupRecyclerView()
         setupListeners()
     }
@@ -54,23 +55,70 @@ class ProfileFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        recipeAdapter = UserRecipeAdapter { recipe ->
-            val intent = Intent(requireContext(), RecipeDetailActivity::class.java)
-            intent.putExtra("RECIPE", recipe)
-            startActivity(intent)
-        }
+        recipeAdapter = UserRecipeAdapter(
+            onClick = { recipe ->
+                val intent = Intent(requireContext(), RecipeDetailActivity::class.java)
+                intent.putExtra("RECIPE", recipe)
+                startActivity(intent)
+            },
+            onLongClick = { recipe, anchorView ->
+                mostrarMenuReceta(recipe, anchorView)
+            }
+        )
         binding.rvUserRecipes.apply {
             adapter = recipeAdapter
             layoutManager = GridLayoutManager(requireContext(), 3)
         }
     }
 
+    private fun mostrarMenuReceta(recipe: Recipe, anchorView: View) {
+        val popup = PopupMenu(requireContext(), anchorView)
+        popup.menu.add(0, 1, 0, "Editar")
+        popup.menu.add(0, 2, 1, "Eliminar")
+        popup.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                1 -> {
+                    val intent = Intent(requireContext(), AddRecipe::class.java)
+                    intent.putExtra(AddRecipe.EXTRA_RECIPE, recipe)
+                    startActivity(intent)
+                    true
+                }
+                2 -> {
+                    confirmarEliminar(recipe)
+                    true
+                }
+                else -> false
+            }
+        }
+        popup.show()
+    }
+
+    private fun confirmarEliminar(recipe: Recipe) {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Eliminar receta")
+            .setMessage("¿Seguro que quieres eliminar \"${recipe.name}\"? Esta acción no se puede deshacer.")
+            .setPositiveButton("Eliminar") { _, _ -> eliminarReceta(recipe) }
+            .setNegativeButton("Cancelar", null)
+            .show()
+    }
+
+    private fun eliminarReceta(recipe: Recipe) {
+        db.collection("recipe").document(recipe.id)
+            .delete()
+            .addOnSuccessListener {
+                Toast.makeText(requireContext(), "Receta eliminada", Toast.LENGTH_SHORT).show()
+                cargarRecetasUsuario()
+            }
+            .addOnFailureListener { e ->
+                android.util.Log.e("ProfileFragment", "Error eliminando receta", e)
+                Toast.makeText(requireContext(), "Error al eliminar la receta", Toast.LENGTH_SHORT).show()
+            }
+    }
+
     private fun setupListeners() {
         binding.btnEditProfile.setOnClickListener {
-            val intent = Intent(requireContext(), ProfileSetupActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(requireContext(), ProfileSetupActivity::class.java))
         }
-
         binding.btnProfileLogout.setOnClickListener {
             cerrarSesion()
         }
@@ -110,26 +158,28 @@ class ProfileFragment : Fragment() {
             }
     }
 
+    private var recetasListener: com.google.firebase.firestore.ListenerRegistration? = null
+
     private fun cargarRecetasUsuario() {
         val currentUser = auth.currentUser ?: return
-
-        db.collection("recipe")
+        recetasListener?.remove()
+        recetasListener = db.collection("recipe")
             .whereEqualTo("userId", currentUser.uid)
-            .orderBy("createdAt", Query.Direction.DESCENDING)
-            .get()
-            .addOnSuccessListener { result ->
-                if (_binding == null) return@addOnSuccessListener
-                
-                val recipes = result.documents.mapNotNull { doc ->
-                    doc.toObject(Recipe::class.java)?.apply { id = doc.id }
-                }
-                
+            .addSnapshotListener { snapshot, error ->
+                if (error != null || _binding == null) return@addSnapshotListener
+                val recipes = snapshot?.documents
+                    ?.mapNotNull { doc -> doc.toObject(Recipe::class.java)?.apply { id = doc.id } }
+                    ?.sortedByDescending { it.id }
+                    ?: emptyList()
                 recipeAdapter.submitList(recipes)
                 binding.tvRecipesCount.text = recipes.size.toString()
             }
-            .addOnFailureListener { e ->
-                android.util.Log.e("ProfileFragment", "Error cargando recetas", e)
-            }
+    }
+
+    override fun onDestroyView() {
+        recetasListener?.remove()
+        super.onDestroyView()
+        _binding = null
     }
 
     private fun cerrarSesion() {
@@ -142,14 +192,12 @@ class ProfileFragment : Fragment() {
         requireActivity().finish()
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
 
-    // Inner class Adapter for the grid
-    private class UserRecipeAdapter(private val onClick: (Recipe) -> Unit) :
-        RecyclerView.Adapter<UserRecipeAdapter.ViewHolder>() {
+
+    private class UserRecipeAdapter(
+        private val onClick: (Recipe) -> Unit,
+        private val onLongClick: (Recipe, View) -> Unit
+    ) : RecyclerView.Adapter<UserRecipeAdapter.ViewHolder>() {
 
         private var recipes = listOf<Recipe>()
 
@@ -169,8 +217,16 @@ class ProfileFragment : Fragment() {
                 .load(recipe.imageURL)
                 .placeholder(R.drawable.input_page_02)
                 .into(holder.binding.ivRecipeGrid)
-            
+
             holder.itemView.setOnClickListener { onClick(recipe) }
+            holder.itemView.setOnLongClickListener {
+                onLongClick(recipe, holder.binding.btnRecipeMenu)
+                true
+            }
+            holder.binding.btnRecipeMenu.visibility = View.VISIBLE
+            holder.binding.btnRecipeMenu.setOnClickListener {
+                onLongClick(recipe, holder.binding.btnRecipeMenu)
+            }
         }
 
         override fun getItemCount() = recipes.size

@@ -6,10 +6,6 @@
         android:title="Editar información" />
 
     <item
-        android:id="@+id/menu_compartir"
-        android:title="Compartir perfil" />
-
-    <item
         android:id="@+id/menu_logout"
         android:title="Cerrar sesión" />
 
