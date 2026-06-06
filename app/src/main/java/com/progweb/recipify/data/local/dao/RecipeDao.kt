@@ -17,4 +17,7 @@ interface RecipeDao {
 
     @Upsert
     suspend fun upsert(recipe: RecipeEntity)
+
+    @Query("DELETE FROM recipes WHERE id = :recipeId")
+    suspend fun deleteById(recipeId: String)
 }

@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.chip.Chip
+import com.google.android.material.snackbar.Snackbar
 import com.progweb.recipify.R
 import com.progweb.recipify.Destacados
 import com.progweb.recipify.addRecipe.AddRecipe
@@ -25,6 +26,7 @@ class HomeFragment : Fragment() {
 
     private val viewModel: HomeViewModel by activityViewModels()
     private lateinit var adapter: RecipeAdapter
+    private var offlineSnackbar: Snackbar? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -134,22 +136,32 @@ class HomeFragment : Fragment() {
     }
 
     private fun observarViewModel() {
-        // Observer for recipes
         viewModel.recetasFiltradas.observe(viewLifecycleOwner) { recetas ->
             adapter.submitList(recetas)
         }
 
-        // Observer for dynamic categories
         viewModel.categorias.observe(viewLifecycleOwner) { categorias ->
             actualizarChips(categorias)
         }
 
-        // Observer for selected category
         viewModel.categoriaSeleccionada.observe(viewLifecycleOwner) { selectedCategory ->
-            // Update chip states if necessary
             for (i in 0 until binding.chipGroup.childCount) {
                 val chip = binding.chipGroup.getChildAt(i) as Chip
                 chip.isChecked = (chip.text == selectedCategory)
+            }
+        }
+
+        viewModel.isOffline.observe(viewLifecycleOwner) { offline ->
+            if (offline) {
+                offlineSnackbar = Snackbar.make(
+                    binding.root,
+                    "Sin conexión — mostrando datos guardados",
+                    Snackbar.LENGTH_INDEFINITE
+                )
+                offlineSnackbar?.show()
+            } else {
+                offlineSnackbar?.dismiss()
+                offlineSnackbar = null
             }
         }
     }

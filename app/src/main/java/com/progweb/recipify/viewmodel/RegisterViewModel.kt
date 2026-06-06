@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -108,6 +109,7 @@ class RegisterViewModel : ViewModel() {
                     
                     _registerState.value = RegisterResult(success = true, usuario = usuario)
                 } catch (e: Exception) {
+                    FirebaseCrashlytics.getInstance().recordException(e)
                     _registerState.value = RegisterResult(errorMessage = "Error en el registro: ${e.message}")
                 }
             }

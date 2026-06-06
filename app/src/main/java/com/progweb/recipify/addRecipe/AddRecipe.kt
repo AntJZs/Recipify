@@ -16,6 +16,7 @@ import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.firestore.firestore
 import com.google.firebase.storage.storage
 import com.progweb.recipify.R
@@ -190,6 +191,7 @@ class AddRecipe : AppCompatActivity() {
                 }
                 .addOnFailureListener { e ->
                     android.util.Log.e("AddRecipe", "Error al subir imagen", e)
+                    FirebaseCrashlytics.getInstance().recordException(e)
                     Toast.makeText(this, "Error al subir imagen", Toast.LENGTH_SHORT).show()
                     viewModel.resetAfterFailure()
                 }

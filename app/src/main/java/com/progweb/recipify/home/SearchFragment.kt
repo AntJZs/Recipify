@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
+import com.google.android.material.snackbar.Snackbar
 import com.progweb.recipify.databinding.FragmentSearchBinding
 import com.progweb.recipify.viewmodel.HomeViewModel
 import com.progweb.recipify.viewmodel.SearchViewModel
@@ -68,6 +69,16 @@ class SearchFragment : Fragment() {
                 val searchIds = searchResults.map { it.id }.toSet()
                 val updatedResults = todas.filter { it.id in searchIds }
                 adapter.submitList(updatedResults)
+            }
+        }
+
+        viewModel.isOffline.observe(viewLifecycleOwner) { offline ->
+            if (offline) {
+                Snackbar.make(
+                    binding.root,
+                    "Sin conexión — la búsqueda no está disponible",
+                    Snackbar.LENGTH_LONG
+                ).show()
             }
         }
     }

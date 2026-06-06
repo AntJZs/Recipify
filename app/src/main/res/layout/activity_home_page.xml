@@ -18,10 +18,7 @@
         android:id="@+id/bottomNav"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/md_theme_surfaceContainer"
         app:elevation="8dp"
-        app:itemIconTint="@color/md_theme_onSurface"
-        app:itemTextColor="@color/md_theme_onSurfaceVariant"
         app:labelVisibilityMode="labeled"
         app:menu="@menu/bottom_nav_menu"
         app:layout_constraintBottom_toBottomOf="parent" />
