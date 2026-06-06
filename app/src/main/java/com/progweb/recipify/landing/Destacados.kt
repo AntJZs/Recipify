@@ -7,15 +7,12 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.recyclerview.widget.GridLayoutManager
 import com.progweb.recipify.databinding.ActivityDestacadosBinding
-import com.progweb.recipify.home.RecipeAdapter
 import com.progweb.recipify.viewmodel.DestacadosViewModel
 
 class Destacados : AppCompatActivity() {
     private lateinit var binding: ActivityDestacadosBinding
     private val viewModel: DestacadosViewModel by viewModels()
-    private lateinit var adapter: RecipeAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,19 +27,8 @@ class Destacados : AppCompatActivity() {
             insets
         }
 
-        setupRecyclerView()
         setupListeners()
         setupObservers()
-    }
-
-    private fun setupRecyclerView() {
-        adapter = RecipeAdapter { recipe ->
-            startActivity(Intent(this, LoginActivity::class.java))
-        }
-        binding.rvDestacados.apply {
-            adapter = this@Destacados.adapter
-            layoutManager = GridLayoutManager(this@Destacados, 2)
-        }
     }
 
     private fun setupListeners() {
@@ -62,9 +48,6 @@ class Destacados : AppCompatActivity() {
                 startActivity(Intent(this, RegisterActivity::class.java))
                 viewModel.onNavigationDone()
             }
-        }
-        viewModel.recetas.observe(this) { recetas ->
-            adapter.submitList(recetas)
         }
     }
 }
