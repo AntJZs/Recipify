@@ -56,6 +56,7 @@ class HomeFragment : Fragment() {
                         if (!photoURL.isNullOrEmpty() && _binding != null) {
                             com.bumptech.glide.Glide.with(this)
                                 .load(photoURL)
+                                .circleCrop()
                                 .placeholder(R.drawable.input_page_01)
                                 .error(R.drawable.input_page_01)
                                 .into(binding.ivAvatar)

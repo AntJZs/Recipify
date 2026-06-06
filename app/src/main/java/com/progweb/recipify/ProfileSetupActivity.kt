@@ -80,6 +80,7 @@ class ProfileSetupActivity : AppCompatActivity() {
             if (state.photoURL.isNotEmpty()) {
                 Glide.with(this)
                     .load(state.photoURL)
+                    .circleCrop()
                     .placeholder(R.drawable.input_page_01)
                     .error(R.drawable.input_page_01)
                     .into(binding.ivSetupAvatar)

@@ -111,6 +111,7 @@ class ProfileFragment : Fragment() {
                     if (photoURL.isNotEmpty()) {
                         Glide.with(this)
                             .load(photoURL)
+                            .circleCrop()
                             .placeholder(R.drawable.input_page_01)
                             .error(R.drawable.input_page_01)
                             .into(binding.ivProfileAvatar)
