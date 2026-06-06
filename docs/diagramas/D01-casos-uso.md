@@ -2,9 +2,11 @@
 
 **Objetivo:** Representar de forma gráfica y estandarizada las interacciones entre los diferentes tipos de usuarios y las funcionalidades principales que ofrece el sistema Recipify, siguiendo el estándar clásico de diagramas UML de casos de uso (Actores Humanos -> Límite del Sistema -> Sistemas Externos).
 
-![Diagrama de casos de uso](D01-casos-uso.jpg)
+## Visualización del Diagrama
 
-## Diagrama de Casos de Uso (PlantUML)
+![Diagrama de casos de uso](Casosdeuso.jpg)
+
+## Especificación en PlantUML
 
 ```plantuml
 @startuml
@@ -82,17 +84,12 @@ UC7 -- Crashlytics
 ## Descripción de Actores y Casos de Uso
 
 ### Actores
-*   **Usuario no autenticado (Izquierda):** Representa al usuario que interactúa con la aplicación de forma anónima o previa al acceso. Sus acciones incluyen el descubrimiento inicial y los flujos de autenticación.
-*   **Usuario autenticado (Izquierda):** Representa al usuario con sesión activa. Posee control total sobre su recetario personal, creación de contenido y configuración de cuenta.
+*   **Usuario no autenticado (Izquierda):** Representa al usuario que interactúa con la aplicación de forma anónima.
+*   **Usuario autenticado (Izquierda):** Usuario con sesión activa y control sobre su recetario personal.
 *   **Sistemas Externos (Derecha):**
-    *   **Firebase:** Gestiona la identidad, la base de datos en la nube y el almacenamiento de medios.
-    *   **TheMealDB:** API externa que provee la base de datos global de recetas.
-    *   **Room:** Sistema de persistencia local que permite el uso de favoritos en modo offline.
-    *   **Crashlytics:** Servicio encargado del reporte y monitoreo de estabilidad técnica.
+    *   **Firebase:** Gestiona la identidad, base de datos en nube y almacenamiento.
+    *   **TheMealDB:** API externa de recetas.
+    *   **Room:** Persistencia local para modo offline.
+    *   **Crashlytics:** Reporte de fallos.
 
-### Casos de Uso Principales
-*   **Acceso y Seguridad:** Procesos de registro e inicio de sesión integrados con servicios de nube.
-*   **Gestión de Contenido:** Flujos para buscar en el catálogo externo y crear recetas personalizadas.
-*   **Persistencia y Resiliencia:** Capacidad de guardar información localmente para consulta sin conexión a red.
-
-> **Nota:** Este diagrama está embebido directamente en el archivo Markdown usando sintaxis PlantUML. Para visualizarlo en Android Studio, asegúrese de tener instalado el plugin de PlantUML y contar con **Graphviz** instalado en su sistema.
+> **Nota:** Para ver la imagen, asegúrate de que el archivo **Casosdeuso.jpg** esté dentro de la carpeta `docs/diagramas/`.
