@@ -172,7 +172,7 @@
                             android:layout_centerVertical="true"
                             android:background="?attr/colorSurfaceContainerHigh"
                             android:scaleType="centerCrop"
-                            android:src="@drawable/input_page_02"
+                            android:src="@drawable/risotto"
                             android:contentDescription="Truffle Risotto" />
                     </RelativeLayout>
                 </androidx.cardview.widget.CardView>
@@ -245,7 +245,7 @@
                             android:layout_centerVertical="true"
                             android:background="?attr/colorSurfaceContainerHigh"
                             android:scaleType="centerCrop"
-                            android:src="@drawable/input_page_01"
+                            android:src="@drawable/tacos"
                             android:contentDescription="Tacos de Pollo" />
                     </RelativeLayout>
                 </androidx.cardview.widget.CardView>
@@ -318,7 +318,7 @@
                             android:layout_centerVertical="true"
                             android:background="?attr/colorSurfaceContainerHigh"
                             android:scaleType="centerCrop"
-                            android:src="@drawable/input_page_02"
+                            android:src="@drawable/carbonara"
                             android:contentDescription="Pasta Carbonara" />
                     </RelativeLayout>
                 </androidx.cardview.widget.CardView>
@@ -391,7 +391,7 @@
                             android:layout_centerVertical="true"
                             android:background="?attr/colorSurfaceContainerHigh"
                             android:scaleType="centerCrop"
-                            android:src="@drawable/input_page_01"
+                            android:src="@drawable/sopatomate"
                             android:contentDescription="Sopa de Tomate" />
                     </RelativeLayout>
                 </androidx.cardview.widget.CardView>
