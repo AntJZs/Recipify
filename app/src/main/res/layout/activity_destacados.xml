@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Guardar en: res/layout/activity_destacados.xml -->
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -19,26 +18,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- Header: logo -->
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingHorizontal="16dp"
-                android:paddingTop="16dp"
-                android:paddingBottom="8dp">
-
-                <ImageView
-                    android:id="@+id/ivAvatar"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_gravity="center"
-                    android:background="@drawable/bg_circle_avatar"
-                    android:clipToOutline="true"
-                    android:outlineProvider="background"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/input_page_01" />
-            </FrameLayout>
-
+            <!-- Hero con botones -->
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="280dp">
@@ -49,14 +29,12 @@
                     android:layout_height="match_parent"
                     android:scaleType="centerCrop"
                     android:background="@color/md_theme_surface"
-                    android:src="@drawable/destacados"
-                    />
+                    android:src="@drawable/destacados" />
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@drawable/gradient_overlay"
-                    />
+                    android:background="@drawable/gradient_overlay" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -117,19 +95,17 @@
                 </LinearLayout>
             </FrameLayout>
 
-            <!-- Contenedor de recetas -->
-            <!-- Lista de recetas destacadas hardcodeadas -->
+            <!-- Recetas destacadas -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:paddingBottom="16dp"
                 android:paddingHorizontal="16dp"
-                android:paddingTop="16dp">
+                android:paddingTop="16dp"
+                android:paddingBottom="16dp">
 
                 <!-- Receta 1 -->
                 <androidx.cardview.widget.CardView
-                    android:id="@+id/cardDestacada1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="12dp"
@@ -197,7 +173,226 @@
                             android:background="?attr/colorSurfaceContainerHigh"
                             android:scaleType="centerCrop"
                             android:src="@drawable/risotto"
-                            />
+                            android:contentDescription="Truffle Risotto" />
+                    </RelativeLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- Receta 2 -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="0dp">
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="12dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="12dp"
+                            android:layout_toStartOf="@+id/ivReceta2"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="8dp"
+                                android:text="Tacos de Pollo"
+                                android:textAppearance="?attr/textAppearanceTitleMedium"
+                                android:textColor="?attr/colorOnSurface"
+                                android:textStyle="bold" />
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <com.google.android.material.chip.Chip
+                                    style="@style/Widget.Material3.Chip.Suggestion"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginEnd="8dp"
+                                    android:text="Principal"
+                                    android:textColor="?attr/colorOnSurfaceVariant"
+                                    app:chipBackgroundColor="?attr/colorSurface"
+                                    app:chipMinHeight="32dp"
+                                    app:chipStrokeColor="?attr/colorOutline"
+                                    app:chipStrokeWidth="1dp" />
+
+                                <com.google.android.material.chip.Chip
+                                    style="@style/Widget.Material3.Chip.Suggestion"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="30 min"
+                                    android:textColor="?attr/colorOnSurfaceVariant"
+                                    app:chipBackgroundColor="?attr/colorSurface"
+                                    app:chipMinHeight="32dp"
+                                    app:chipStrokeColor="?attr/colorOutline"
+                                    app:chipStrokeWidth="1dp" />
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <ImageView
+                            android:id="@+id/ivReceta2"
+                            android:layout_width="100dp"
+                            android:layout_height="80dp"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:background="?attr/colorSurfaceContainerHigh"
+                            android:scaleType="centerCrop"
+                            android:src="@drawable/tacos"
+                            android:contentDescription="Tacos de Pollo" />
+                    </RelativeLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- Receta 3 -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="0dp">
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="12dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="12dp"
+                            android:layout_toStartOf="@+id/ivReceta3"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="8dp"
+                                android:text="Pasta Carbonara"
+                                android:textAppearance="?attr/textAppearanceTitleMedium"
+                                android:textColor="?attr/colorOnSurface"
+                                android:textStyle="bold" />
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <com.google.android.material.chip.Chip
+                                    style="@style/Widget.Material3.Chip.Suggestion"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginEnd="8dp"
+                                    android:text="Pasta"
+                                    android:textColor="?attr/colorOnSurfaceVariant"
+                                    app:chipBackgroundColor="?attr/colorSurface"
+                                    app:chipMinHeight="32dp"
+                                    app:chipStrokeColor="?attr/colorOutline"
+                                    app:chipStrokeWidth="1dp" />
+
+                                <com.google.android.material.chip.Chip
+                                    style="@style/Widget.Material3.Chip.Suggestion"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="20 min"
+                                    android:textColor="?attr/colorOnSurfaceVariant"
+                                    app:chipBackgroundColor="?attr/colorSurface"
+                                    app:chipMinHeight="32dp"
+                                    app:chipStrokeColor="?attr/colorOutline"
+                                    app:chipStrokeWidth="1dp" />
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <ImageView
+                            android:id="@+id/ivReceta3"
+                            android:layout_width="100dp"
+                            android:layout_height="80dp"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:background="?attr/colorSurfaceContainerHigh"
+                            android:scaleType="centerCrop"
+                            android:src="@drawable/carbonara"
+                            android:contentDescription="Pasta Carbonara" />
+                    </RelativeLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- Receta 4 -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="0dp">
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="12dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="12dp"
+                            android:layout_toStartOf="@+id/ivReceta4"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="8dp"
+                                android:text="Sopa de Tomate"
+                                android:textAppearance="?attr/textAppearanceTitleMedium"
+                                android:textColor="?attr/colorOnSurface"
+                                android:textStyle="bold" />
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <com.google.android.material.chip.Chip
+                                    style="@style/Widget.Material3.Chip.Suggestion"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginEnd="8dp"
+                                    android:text="Sopa"
+                                    android:textColor="?attr/colorOnSurfaceVariant"
+                                    app:chipBackgroundColor="?attr/colorSurface"
+                                    app:chipMinHeight="32dp"
+                                    app:chipStrokeColor="?attr/colorOutline"
+                                    app:chipStrokeWidth="1dp" />
+
+                                <com.google.android.material.chip.Chip
+                                    style="@style/Widget.Material3.Chip.Suggestion"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="15 min"
+                                    android:textColor="?attr/colorOnSurfaceVariant"
+                                    app:chipBackgroundColor="?attr/colorSurface"
+                                    app:chipMinHeight="32dp"
+                                    app:chipStrokeColor="?attr/colorOutline"
+                                    app:chipStrokeWidth="1dp" />
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <ImageView
+                            android:id="@+id/ivReceta4"
+                            android:layout_width="100dp"
+                            android:layout_height="80dp"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:background="?attr/colorSurfaceContainerHigh"
+                            android:scaleType="centerCrop"
+                            android:src="@drawable/sopatomate"
+                            android:contentDescription="Sopa de Tomate" />
                     </RelativeLayout>
                 </androidx.cardview.widget.CardView>
 

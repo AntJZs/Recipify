@@ -5,7 +5,9 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Source
 import com.progweb.recipify.R
 import com.progweb.recipify.databinding.ActivityRecipeDetailBinding
 import com.progweb.recipify.datamodels.Recipe
@@ -41,63 +43,68 @@ class RecipeDetailActivity : AppCompatActivity() {
     }
 
     private fun checkBookmarkStatus(uid: String, recipeId: String) {
+        // Cache first — instant, works offline
         db.collection("users").document(uid)
             .collection("bookmarks").document(recipeId)
-            .get()
+            .get(Source.CACHE)
             .addOnSuccessListener { doc ->
-                isBookmarked = doc != null && doc.exists()
+                isBookmarked = doc.exists()
                 updateBookmarkIcon()
+            }
+            .addOnFailureListener {
+                // Not cached yet — try network
+                db.collection("users").document(uid)
+                    .collection("bookmarks").document(recipeId)
+                    .get()
+                    .addOnSuccessListener { doc ->
+                        isBookmarked = doc.exists()
+                        updateBookmarkIcon()
+                    }
+                    .addOnFailureListener {
+                        isBookmarked = false
+                        updateBookmarkIcon()
+                    }
             }
     }
 
     private fun updateBookmarkIcon() {
-        if (isBookmarked) {
-            binding.fabBookmark.setImageResource(R.drawable.bookmark_filled_24px)
-        } else {
-            binding.fabBookmark.setImageResource(R.drawable.bookmark_24px)
-        }
+        binding.fabBookmark.setImageResource(
+            if (isBookmarked) R.drawable.bookmark_filled_24px else R.drawable.bookmark_24px
+        )
     }
 
     private fun setupBookmarkListener(uid: String, recipe: Recipe) {
         binding.fabBookmark.setOnClickListener {
-            val bookmarksRef = db.collection("users").document(uid).collection("bookmarks").document(recipe.id)
+            val bookmarksRef = db.collection("users").document(uid)
+                .collection("bookmarks").document(recipe.id)
             val userRef = db.collection("users").document(uid)
 
-            db.runTransaction { transaction ->
-                val bookmarkDoc = transaction.get(bookmarksRef)
-                val userDoc = transaction.get(userRef)
+            // Optimistic update: flip state and update UI immediately.
+            // Firestore writes go to local cache first, sync when online.
+            isBookmarked = !isBookmarked
+            updateBookmarkIcon()
 
-                val currentBookmarkCount = userDoc.getLong("bookmarksCount") ?: 0
-
-                if (bookmarkDoc.exists()) {
-                    transaction.delete(bookmarksRef)
-                    transaction.update(userRef, "bookmarksCount", maxOf(0, currentBookmarkCount - 1))
-                    false
-                } else {
-                    val bookmarkData = hashMapOf(
-                        "id" to recipe.id,
-                        "name" to recipe.name,
-                        "imageURL" to recipe.imageURL,
-                        "category" to recipe.category,
-                        "totalTimeMinutes" to recipe.totalTimeMinutes,
-                        "description" to recipe.description,
-                        "body" to recipe.body,
-                        "ingredients" to recipe.ingredients,
-                        "area" to recipe.area,
-                        "userId" to recipe.userId,
-                        "bookmarkedAt" to com.google.firebase.Timestamp.now()
-                    )
-                    transaction.set(bookmarksRef, bookmarkData)
-                    transaction.update(userRef, "bookmarksCount", currentBookmarkCount + 1)
-                    true
-                }
-            }.addOnSuccessListener { newBookmarkState ->
-                isBookmarked = newBookmarkState
-                updateBookmarkIcon()
-                val message = if (isBookmarked) getString(R.string.recipe_saved) else getString(R.string.recipe_removed)
-                Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-            }.addOnFailureListener { e ->
-                Toast.makeText(this, getString(R.string.error_message_prefix, e.message), Toast.LENGTH_SHORT).show()
+            if (isBookmarked) {
+                val bookmarkData = hashMapOf(
+                    "id"               to recipe.id,
+                    "name"             to recipe.name,
+                    "imageURL"         to recipe.imageURL,
+                    "category"         to recipe.category,
+                    "totalTimeMinutes" to recipe.totalTimeMinutes,
+                    "description"      to recipe.description,
+                    "body"             to recipe.body,
+                    "ingredients"      to recipe.ingredients,
+                    "area"             to recipe.area,
+                    "userId"           to recipe.userId,
+                    "bookmarkedAt"     to com.google.firebase.Timestamp.now()
+                )
+                bookmarksRef.set(bookmarkData)
+                userRef.update("bookmarksCount", FieldValue.increment(1))
+                Toast.makeText(this, getString(R.string.recipe_saved), Toast.LENGTH_SHORT).show()
+            } else {
+                bookmarksRef.delete()
+                userRef.update("bookmarksCount", FieldValue.increment(-1))
+                Toast.makeText(this, getString(R.string.recipe_removed), Toast.LENGTH_SHORT).show()
             }
         }
     }
