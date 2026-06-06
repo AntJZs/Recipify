@@ -11,10 +11,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="24dp"
+        android:paddingHorizontal="24dp"
+        android:paddingBottom="32dp"
         android:gravity="center_horizontal">
 
-        <!-- Avatar Card -->
+        <!-- Avatar -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="110dp"
             android:layout_height="110dp"
@@ -22,8 +23,8 @@
             app:strokeWidth="3dp"
             app:strokeColor="?attr/colorPrimary"
             app:cardElevation="4dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp">
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="14dp">
 
             <ImageView
                 android:id="@+id/ivProfileAvatar"
@@ -34,82 +35,116 @@
                 android:contentDescription="Avatar de perfil" />
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Names -->
-        <TextView
-            android:id="@+id/tvProfileDisplayName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Nombre de Usuario"
-            android:textAppearance="?attr/textAppearanceHeadlineMedium"
-            android:textStyle="bold"
-            android:textColor="?attr/colorOnSurface"
-            android:gravity="center" />
-
+        <!-- Username (primary) -->
         <TextView
             android:id="@+id/tvProfileUsername"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="\@usuario"
-            android:textAppearance="?attr/textAppearanceBodyMedium"
-            android:textColor="?attr/colorPrimary"
-            android:gravity="center"
-            android:layout_marginTop="2dp"
-            android:layout_marginBottom="16dp" />
+            android:textAppearance="?attr/textAppearanceTitleLarge"
+            android:textStyle="bold"
+            android:textColor="?attr/colorOnSurface"
+            android:gravity="center" />
 
-        <!-- Stats Counter Row -->
-        <LinearLayout
+        <!-- Display name (secondary) -->
+        <TextView
+            android:id="@+id/tvProfileDisplayName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nombre de Usuario"
+            android:textAppearance="?attr/textAppearanceBodyMedium"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:gravity="center"
+            android:layout_marginTop="2dp" />
+
+        <!-- Bio -->
+        <TextView
+            android:id="@+id/tvProfileBio"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:gravity="center"
-            android:layout_marginBottom="24dp">
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="20dp"
+            android:textAppearance="?attr/textAppearanceBodyMedium"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:textStyle="italic"
+            android:visibility="gone" />
+
+        <!-- Stats Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="?attr/colorOutlineVariant"
+            app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
+            android:layout_marginBottom="20dp">
 
             <LinearLayout
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:gravity="center">
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:paddingVertical="16dp">
 
-                <TextView
-                    android:id="@+id/tvRecipesCount"
-                    android:layout_width="wrap_content"
+                <!-- Recetas -->
+                <LinearLayout
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="0"
-                    android:textAppearance="?attr/textAppearanceTitleLarge"
-                    android:textStyle="bold"
-                    android:textColor="?attr/colorOnSurface" />
-                <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center">
+
+                    <TextView
+                        android:id="@+id/tvRecipesCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textAppearance="?attr/textAppearanceTitleLarge"
+                        android:textStyle="bold"
+                        android:textColor="?attr/colorOnSurface" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Recetas"
+                        android:textAppearance="?attr/textAppearanceLabelMedium"
+                        android:textColor="?attr/colorOnSurfaceVariant" />
+                </LinearLayout>
+
+                <!-- Divider -->
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="40dp"
+                    android:background="?attr/colorOutlineVariant" />
+
+                <!-- Guardados -->
+                <LinearLayout
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="Recetas"
-                    android:textAppearance="?attr/textAppearanceLabelMedium"
-                    android:textColor="?attr/colorOnSurfaceVariant" />
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center">
+
+                    <TextView
+                        android:id="@+id/tvBookmarksCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textAppearance="?attr/textAppearanceTitleLarge"
+                        android:textStyle="bold"
+                        android:textColor="?attr/colorOnSurface" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Guardados"
+                        android:textAppearance="?attr/textAppearanceLabelMedium"
+                        android:textColor="?attr/colorOnSurfaceVariant" />
+                </LinearLayout>
             </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:gravity="center">
-
-                <TextView
-                    android:id="@+id/tvBookmarksCount"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="0"
-                    android:textAppearance="?attr/textAppearanceTitleLarge"
-                    android:textStyle="bold"
-                    android:textColor="?attr/colorOnSurface" />
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Guardados"
-                    android:textAppearance="?attr/textAppearanceLabelMedium"
-                    android:textColor="?attr/colorOnSurfaceVariant" />
-            </LinearLayout>
-        </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
         <!-- Edit Profile Button -->
         <com.google.android.material.button.MaterialButton
@@ -119,9 +154,9 @@
             android:text="Editar Perfil"
             style="@style/Widget.Material3.Button.TonalButton"
             app:cornerRadius="24dp"
-            android:layout_marginBottom="16dp" />
+            android:layout_marginBottom="20dp" />
 
-        <!-- Tabs Divider -->
+        <!-- Section header -->
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
@@ -134,9 +169,10 @@
             android:text="Mis Publicaciones"
             android:textAppearance="?attr/textAppearanceTitleMedium"
             android:textStyle="bold"
+            android:textColor="?attr/colorOnSurface"
             android:layout_marginBottom="12dp" />
 
-        <!-- Grid de Recetas -->
+        <!-- Recipe grid -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvUserRecipes"
             android:layout_width="match_parent"
@@ -146,7 +182,7 @@
             tools:spanCount="3"
             tools:listitem="@layout/item_recipe_grid" />
 
-        <!-- Logout simple text button at the bottom -->
+        <!-- Logout -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnProfileLogout"
             android:layout_width="wrap_content"
@@ -154,18 +190,8 @@
             android:text="Cerrar Sesión"
             style="@style/Widget.Material3.Button.TextButton"
             android:textColor="?attr/colorError"
-            android:layout_marginTop="32dp" />
+            android:layout_marginTop="28dp" />
 
-        <!-- Bio and Location hidden by default or moved to details -->
-        <LinearLayout
-            android:id="@+id/llProfileDetails"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:visibility="gone">
-            <TextView android:id="@+id/tvProfileBio" android:layout_width="wrap_content" android:layout_height="wrap_content" />
-            <TextView android:id="@+id/tvProfileLocation" android:layout_width="wrap_content" android:layout_height="wrap_content" />
-        </LinearLayout>
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

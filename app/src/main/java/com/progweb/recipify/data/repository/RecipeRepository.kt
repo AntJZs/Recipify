@@ -2,6 +2,7 @@ package com.progweb.recipify.data.repository
 
 import android.content.Context
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -15,6 +16,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 class RecipeRepository private constructor(
     private val db: AppDatabase,
@@ -40,7 +42,10 @@ class RecipeRepository private constructor(
     private fun syncRecipes() {
         firestore.collection("recipe")
             .addSnapshotListener { snapshot, error ->
-                if (error != null || snapshot == null) return@addSnapshotListener
+                if (error != null || snapshot == null) {
+                    error?.let { FirebaseCrashlytics.getInstance().recordException(it) }
+                    return@addSnapshotListener
+                }
                 val entities = snapshot.documents.mapNotNull { doc ->
                     doc.toObject(Recipe::class.java)?.also { it.id = doc.id }
                 }.map { it.toEntity("firestore") }
@@ -52,7 +57,10 @@ class RecipeRepository private constructor(
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         firestore.collection("users").document(userId).collection("bookmarks")
             .addSnapshotListener { snapshot, error ->
-                if (error != null || snapshot == null) return@addSnapshotListener
+                if (error != null || snapshot == null) {
+                    error?.let { FirebaseCrashlytics.getInstance().recordException(it) }
+                    return@addSnapshotListener
+                }
                 val bookmarks = snapshot.documents.map { BookmarkEntity(it.id) }
                 scope.launch { db.bookmarkDao().replaceAll(bookmarks) }
             }
@@ -60,6 +68,11 @@ class RecipeRepository private constructor(
 
     fun refreshBookmarkSync() {
         syncBookmarks()
+    }
+
+    suspend fun deleteRecipe(recipeId: String) {
+        db.recipeDao().deleteById(recipeId)
+        firestore.collection("recipe").document(recipeId).delete().await()
     }
 
     suspend fun saveRecipe(recipe: Recipe) {

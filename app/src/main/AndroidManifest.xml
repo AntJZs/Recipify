@@ -53,6 +53,9 @@
         <activity
             android:name=".addRecipe.AddRecipe"
             android:exported="false" />
+        <activity
+            android:name=".publicProfile.PublicProfileActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

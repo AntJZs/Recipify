@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.firestore.FirebaseFirestore
 import com.progweb.recipify.com.progweb.recipify.datamodels.UsuariosManager
 
@@ -149,6 +150,7 @@ class LoginViewModel : ViewModel() {
                 )
             }
             .addOnFailureListener { e ->
+                FirebaseCrashlytics.getInstance().recordException(e)
                 _loginState.value = LoginResult(
                     errorMessage = "Error al inicializar perfil en Firestore: ${e.message}"
                 )

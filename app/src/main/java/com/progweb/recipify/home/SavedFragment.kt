@@ -6,20 +6,23 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.GridLayoutManager
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
+import com.google.android.material.snackbar.Snackbar
 import com.progweb.recipify.databinding.FragmentSavedBinding
-import com.progweb.recipify.datamodels.Recipe
 import com.progweb.recipify.recipeDetail.RecipeDetailActivity
+import com.progweb.recipify.viewmodel.SavedViewModel
+import kotlinx.coroutines.launch
 
 class SavedFragment : Fragment() {
 
     private var _binding: FragmentSavedBinding? = null
     private val binding get() = _binding!!
 
-    private val auth = FirebaseAuth.getInstance()
-    private val db = FirebaseFirestore.getInstance()
+    private val viewModel: SavedViewModel by viewModels()
     private lateinit var adapter: RecipeAdapter
 
     override fun onCreateView(
@@ -33,9 +36,8 @@ class SavedFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         configurarRecyclerView()
-        escucharFavoritos()
+        observarViewModel()
     }
 
     private fun configurarRecyclerView() {
@@ -48,46 +50,32 @@ class SavedFragment : Fragment() {
         binding.rvSavedRecipes.layoutManager = GridLayoutManager(requireContext(), 2)
     }
 
-    private fun escucharFavoritos() {
-        val currentUser = auth.currentUser
-        if (currentUser == null) {
-            binding.llEmptyState.visibility = View.VISIBLE
-            binding.rvSavedRecipes.visibility = View.GONE
-            return
-        }
-
-        db.collection("users").document(currentUser.uid)
-            .collection("bookmarks")
-            .addSnapshotListener { value, error ->
-                if (error != null) {
-                    android.util.Log.e("SAVED_FRAGMENT", "Error al escuchar favoritos", error)
-                    return@addSnapshotListener
-                }
-
-                if (_binding == null) return@addSnapshotListener
-
-                val bookmarkedRecipes = mutableListOf<Recipe>()
-                value?.documents?.forEach { doc ->
-                    try {
-                        val recipe = doc.toObject(Recipe::class.java)
-                        recipe?.let {
-                            it.id = doc.id
-                            bookmarkedRecipes.add(it)
+    private fun observarViewModel() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiState.collect { state ->
+                    when {
+                        state.isNotLoggedIn -> {
+                            binding.llEmptyState.visibility = View.VISIBLE
+                            binding.rvSavedRecipes.visibility = View.GONE
                         }
-                    } catch (e: Exception) {
-                        android.util.Log.e("SAVED_FRAGMENT", "Error al parsear receta ${doc.id}", e)
+                        state.isEmpty -> {
+                            binding.llEmptyState.visibility = View.VISIBLE
+                            binding.rvSavedRecipes.visibility = View.GONE
+                        }
+                        else -> {
+                            binding.llEmptyState.visibility = View.GONE
+                            binding.rvSavedRecipes.visibility = View.VISIBLE
+                            adapter.submitList(state.recipes)
+                        }
+                    }
+
+                    state.error?.let { msg ->
+                        Snackbar.make(binding.root, msg, Snackbar.LENGTH_LONG).show()
                     }
                 }
-
-                if (bookmarkedRecipes.isEmpty()) {
-                    binding.llEmptyState.visibility = View.VISIBLE
-                    binding.rvSavedRecipes.visibility = View.GONE
-                } else {
-                    binding.llEmptyState.visibility = View.GONE
-                    binding.rvSavedRecipes.visibility = View.VISIBLE
-                    adapter.submitList(bookmarkedRecipes)
-                }
             }
+        }
     }
 
     override fun onDestroyView() {

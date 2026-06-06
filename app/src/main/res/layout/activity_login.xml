@@ -81,16 +81,6 @@
                 android:background="@drawable/input_redondeado"/>
         </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.button.MaterialButton
-            style="@style/Widget.Material3.Button.TextButton"
-            android:textColor="@color/md_theme_onSecondaryContainer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="start"
-            android:layout_marginTop="-16dp"
-            android:layout_marginBottom="16dp"
-            android:text="¿Olvidaste tu contraseña?" />
-
         <!-- Botón principal -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnIngresar"

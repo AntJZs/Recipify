@@ -5,9 +5,11 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.progweb.recipify.data.repository.RecipeRepository
 import com.progweb.recipify.datamodels.Recipe
 import com.progweb.recipify.network.MealApiService
+import com.progweb.recipify.util.NetworkUtils
 import kotlinx.coroutines.launch
 
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
@@ -37,6 +39,9 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     private val _bookmarkedRecipeIds = MutableLiveData<Set<String>>(emptySet())
     val bookmarkedRecipeIds: LiveData<Set<String>> = _bookmarkedRecipeIds
 
+    private val _isOffline = MutableLiveData(false)
+    val isOffline: LiveData<Boolean> = _isOffline
+
     init {
         repository.startFirestoreSync()
         viewModelScope.launch {
@@ -55,6 +60,10 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun fetchInitialRecipes() {
+        val offline = !NetworkUtils.isOnline(getApplication())
+        _isOffline.postValue(offline)
+        if (offline) return
+
         viewModelScope.launch {
             try {
                 var response = apiService.searchMeals("all")
@@ -67,12 +76,15 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 if (recipes.size < 10) cargarMasRecetas()
             } catch (e: Exception) {
                 android.util.Log.e("API_ERROR", "Error inicial", e)
+                FirebaseCrashlytics.getInstance().recordException(e)
+                _isOffline.postValue(true)
                 cargarMasRecetas()
             }
         }
     }
 
     fun cargarMasRecetas() {
+        if (!NetworkUtils.isOnline(getApplication())) return
         if (estaCargando || alfabetIndex >= alfabeto.size) return
         estaCargando = true
         viewModelScope.launch {
@@ -88,6 +100,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 combinarYActualizar()
             } catch (e: Exception) {
                 android.util.Log.e("API_ERROR", "Error cargando más letra ${alfabeto[alfabetIndex]}", e)
+                FirebaseCrashlytics.getInstance().recordException(e)
             } finally {
                 estaCargando = false
             }

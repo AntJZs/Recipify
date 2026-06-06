@@ -78,7 +78,6 @@
                 android:layout_height="wrap_content"
                 android:hint="Nombre de usuario (@usuario)"
                 app:helperText="El nombre de usuario debe ser único"
-                app:startIconDrawable="@android:drawable/ic_menu_myplaces"
                 android:layout_marginBottom="16dp">
 
                 <com.google.android.material.textfield.TextInputEditText

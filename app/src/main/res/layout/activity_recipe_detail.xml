@@ -74,9 +74,12 @@
 
             <TextView
                 android:id="@+id/tvAuthorName"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
+                android:paddingVertical="4dp"
+                android:paddingHorizontal="2dp"
+                android:background="?attr/selectableItemBackground"
                 android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
                 android:textColor="?attr/colorPrimary"
                 tools:text="por Juan Perez" />

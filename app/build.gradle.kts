@@ -2,6 +2,7 @@
 plugins {
     alias(libs.plugins.android.application)
     id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
     id("com.google.devtools.ksp")
 }
 
@@ -58,6 +59,7 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.storage)
+    implementation(libs.firebase.crashlytics)
     implementation(libs.google.play.services.auth)
     // ViewModel
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.0")
