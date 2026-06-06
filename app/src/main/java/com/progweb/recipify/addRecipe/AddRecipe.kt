@@ -43,6 +43,7 @@ class AddRecipe : AppCompatActivity() {
 
     private var editingRecipeId: String? = null
     private var existingImageUrl: String = ""
+    private var recipeSaved = false
 
     private val imagePickerLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         uri?.let {
@@ -284,13 +285,14 @@ class AddRecipe : AppCompatActivity() {
     }
 
     private fun clearDraft() {
+        recipeSaved = true
         val uid = Firebase.auth.currentUser?.uid ?: return
         getSharedPreferences("drafts", MODE_PRIVATE).edit().remove("draft_recipe_$uid").apply()
     }
 
     override fun onPause() {
         super.onPause()
-        if (editingRecipeId == null) saveDraft()
+        if (editingRecipeId == null && !recipeSaved) saveDraft()
     }
 
     private fun saveDraft() {
