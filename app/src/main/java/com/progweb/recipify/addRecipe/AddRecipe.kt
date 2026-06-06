@@ -15,7 +15,6 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.bumptech.glide.Glide
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
-import com.google.firebase.crashlytics.crashlytics
 import com.google.firebase.firestore.firestore
 import com.google.firebase.storage.storage
 import com.progweb.recipify.R
@@ -30,7 +29,6 @@ class AddRecipe : AppCompatActivity() {
 
     private val db = Firebase.firestore
     private val storage = Firebase.storage
-    private val crashlytics = Firebase.crashlytics
     private lateinit var binding: ActivityAddRecipeBinding
     private val viewModel: AddRecipeViewModel by viewModels()
     private var selectedImageUri: Uri? = null
@@ -159,7 +157,7 @@ class AddRecipe : AppCompatActivity() {
                     }
                 }
                 .addOnFailureListener { e ->
-                    crashlytics.recordException(e)
+                    android.util.Log.e("AddRecipe", "Error al subir imagen", e)
                     Toast.makeText(this, "Error al subir imagen", Toast.LENGTH_SHORT).show()
                     viewModel.resetAfterFailure()
                 }
@@ -203,7 +201,7 @@ class AddRecipe : AppCompatActivity() {
                 clearDraft()
                 finish()
             }.addOnFailureListener { e ->
-                crashlytics.recordException(e)
+                android.util.Log.e("AddRecipe", "Error al guardar receta", e)
                 viewModel.resetAfterFailure()
                 Toast.makeText(this, getString(R.string.msg_error_guardar_receta), Toast.LENGTH_LONG).show()
             }
