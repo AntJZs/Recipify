@@ -8,7 +8,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.firestore.FirebaseFirestore
-import com.progweb.recipify.com.progweb.recipify.datamodels.UsuariosManager
 
 class LoginViewModel : ViewModel() {
 
@@ -29,44 +28,28 @@ class LoginViewModel : ViewModel() {
 
     fun login(usuario: String, password: String) {
         if (usuario.isEmpty()) {
-            _loginState.value = LoginResult(errorUsuario = "El usuario/correo no puede estar vacío")
+            _loginState.value = LoginResult(errorUsuario = "El correo no puede estar vacío")
             return
         }
-
         if (password.isEmpty()) {
             _loginState.value = LoginResult(errorPassword = "La contraseña no puede estar vacía")
             return
         }
+        if (!usuario.contains("@")) {
+            _loginState.value = LoginResult(errorUsuario = "Ingresa un correo electrónico válido")
+            return
+        }
 
-        // Try Firebase Auth first if it looks like an email
-        if (usuario.contains("@")) {
-            auth.signInWithEmailAndPassword(usuario, password)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        checkUserVerification()
-                    } else {
-                        // If firebase fails, check local UsuariosManager as fallback
-                        checkLocalLogin(usuario, password, task.exception?.message)
-                    }
+        auth.signInWithEmailAndPassword(usuario, password)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    checkUserVerification()
+                } else {
+                    _loginState.value = LoginResult(
+                        errorMessage = task.exception?.message ?: "Credenciales incorrectas"
+                    )
                 }
-        } else {
-            // Not an email, check local UsuariosManager
-            checkLocalLogin(usuario, password)
-        }
-    }
-
-    private fun checkLocalLogin(usuario: String, password: String, firebaseError: String? = null) {
-        val usuarioGuardado = UsuariosManager.usuarios[usuario]
-
-        if ((usuarioGuardado != null && usuarioGuardado.password == password) || (usuario == "admin" && password == "1234")) {
-            // Local users don't need Firestore verification
-            _loginState.value = LoginResult(success = true, usuario = usuario, needsProfileSetup = false)
-        } else {
-            _loginState.value = LoginResult(
-                errorMessage = if (firebaseError != null) "Error de Firebase: $firebaseError. Además, no se encontró el usuario localmente."
-                else "Usuario o contraseña incorrectos"
-            )
-        }
+            }
     }
 
     fun loginWithGoogle(idToken: String) {
@@ -76,20 +59,20 @@ class LoginViewModel : ViewModel() {
                 if (task.isSuccessful) {
                     checkUserVerification()
                 } else {
-                    _loginState.value = LoginResult(errorMessage = task.exception?.message ?: "Error de Google Login")
+                    _loginState.value = LoginResult(
+                        errorMessage = task.exception?.message ?: "Error al iniciar con Google"
+                    )
                 }
             }
     }
 
     private fun checkUserVerification() {
-        val currentUser = auth.currentUser
-        val uid = currentUser?.uid
-        if (uid == null) {
+        val currentUser = auth.currentUser ?: run {
             _loginState.value = LoginResult(errorMessage = "Usuario no autenticado")
             return
         }
 
-        db.collection("users").document(uid).get()
+        db.collection("users").document(currentUser.uid).get()
             .addOnCompleteListener { docTask ->
                 if (docTask.isSuccessful) {
                     val doc = docTask.result
@@ -98,18 +81,16 @@ class LoginViewModel : ViewModel() {
                         val username = doc.getString("username")
                         _loginState.value = LoginResult(
                             success = true,
-                            usuario = if (!username.isNullOrEmpty()) username else currentUser.displayName ?: currentUser.email,
+                            usuario = if (!username.isNullOrEmpty()) username else currentUser.email,
                             needsProfileSetup = !isVerified
                         )
                     } else {
-                        // Create document in Firestore with isVerified = false
                         createUserDocument(currentUser)
                     }
                 } else {
-                    // Fallback to offline/permissions issue: assume profile setup is needed to complete name check
                     _loginState.value = LoginResult(
                         success = true,
-                        usuario = currentUser.displayName ?: currentUser.email,
+                        usuario = currentUser.email,
                         needsProfileSetup = true
                     )
                 }
@@ -119,17 +100,14 @@ class LoginViewModel : ViewModel() {
     private fun createUserDocument(currentUser: com.google.firebase.auth.FirebaseUser) {
         val email = currentUser.email ?: ""
         val displayName = currentUser.displayName ?: ""
-        val photoUrl = currentUser.photoUrl?.toString() ?: "https://placehold.net/avatar.png"
-
+        val photoUrl = currentUser.photoUrl?.toString() ?: ""
         val names = displayName.split(" ")
-        val firstName = names.getOrNull(0) ?: ""
-        val lastName = if (names.size > 1) names.subList(1, names.size).joinToString(" ") else ""
 
         val userData = mapOf(
             "username" to "",
             "displayName" to displayName,
-            "firstName" to firstName,
-            "lastName" to lastName,
+            "firstName" to (names.getOrNull(0) ?: ""),
+            "lastName" to (if (names.size > 1) names.subList(1, names.size).joinToString(" ") else ""),
             "email" to email,
             "photoURL" to photoUrl,
             "bio" to "",
@@ -143,17 +121,11 @@ class LoginViewModel : ViewModel() {
 
         db.collection("users").document(currentUser.uid).set(userData)
             .addOnSuccessListener {
-                _loginState.value = LoginResult(
-                    success = true,
-                    usuario = email,
-                    needsProfileSetup = true
-                )
+                _loginState.value = LoginResult(success = true, usuario = email, needsProfileSetup = true)
             }
             .addOnFailureListener { e ->
                 FirebaseCrashlytics.getInstance().recordException(e)
-                _loginState.value = LoginResult(
-                    errorMessage = "Error al inicializar perfil en Firestore: ${e.message}"
-                )
+                _loginState.value = LoginResult(errorMessage = "Error al crear perfil: ${e.message}")
             }
     }
 }

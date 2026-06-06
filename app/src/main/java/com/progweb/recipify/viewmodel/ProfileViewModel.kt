@@ -11,7 +11,6 @@ import com.progweb.recipify.datamodels.Recipe
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
@@ -37,6 +36,16 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
     private val _uiState = MutableStateFlow(UiState())
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
+    init {
+        repository.startFirestoreSync()
+        // Colecta el conteo reactivamente: cada vez que Room cambia, el conteo se actualiza solo
+        viewModelScope.launch {
+            repository.bookmarkedIds.collect { ids ->
+                _uiState.value = _uiState.value.copy(bookmarksCount = ids.size.toLong())
+            }
+        }
+    }
+
     fun loadProfile() {
         val currentUser = auth.currentUser ?: run {
             _uiState.value = UiState(loggedOut = true)
@@ -52,8 +61,8 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
                 val displayName: String
                 val username: String
                 val photoURL: String
-
                 val bio: String
+
                 if (doc.exists()) {
                     displayName = doc.getString("displayName") ?: currentUser.displayName ?: "Recipifyer"
                     username = doc.getString("username") ?: ""
@@ -66,8 +75,6 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
                     bio = ""
                 }
 
-                val bookmarksCount = repository.bookmarkedIds.first().size.toLong()
-
                 val recipesDocs = firestore.collection("recipe")
                     .whereEqualTo("userId", currentUser.uid)
                     .get().await()
@@ -76,15 +83,16 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
                     .mapNotNull { d -> d.toObject(Recipe::class.java)?.apply { id = d.id } }
                     .sortedByDescending { it.id }
 
-                _uiState.value = UiState(
+                // .copy() preserva bookmarksCount que el colector ya actualizó
+                _uiState.value = _uiState.value.copy(
                     displayName = displayName,
                     username = username,
                     bio = bio,
                     photoURL = photoURL,
-                    bookmarksCount = bookmarksCount,
                     recipesCount = recipes.size,
                     recipes = recipes,
-                    isLoading = false
+                    isLoading = false,
+                    error = null
                 )
             } catch (e: Exception) {
                 FirebaseCrashlytics.getInstance().recordException(e)

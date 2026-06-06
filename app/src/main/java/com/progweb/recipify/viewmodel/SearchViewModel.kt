@@ -6,15 +6,18 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.progweb.recipify.data.repository.RecipeRepository
 import com.progweb.recipify.datamodels.Recipe
 import com.progweb.recipify.network.MealApiService
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class SearchViewModel(application: Application) : AndroidViewModel(application) {
 
     private val apiService = MealApiService.create()
+    private val repository = RecipeRepository.getInstance(application)
 
     private val _searchResults = MutableLiveData<List<Recipe>>()
     val searchResults: LiveData<List<Recipe>> = _searchResults
@@ -27,6 +30,10 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
 
     private var searchJob: Job? = null
 
+    init {
+        repository.startFirestoreSync()
+    }
+
     fun searchRecipes(query: String) {
         searchJob?.cancel()
 
@@ -37,17 +44,27 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
         }
 
         _isOffline.value = false
+
         searchJob = viewModelScope.launch {
-            _isLoading.value = true
+            // Resultados locales (recetas de usuarios) de forma inmediata
+            val localResults = repository.firestoreRecipes.first()
+                .filter { it.name.contains(query, ignoreCase = true) }
+            _searchResults.value = localResults
+
+            // Debounce antes de llamar a la API
             delay(500)
+            _isLoading.value = true
+
             try {
                 val response = apiService.searchMeals(query)
-                _searchResults.value = response.meals?.map { it.toRecipe() } ?: emptyList()
+                val apiResults = response.meals?.map { it.toRecipe() } ?: emptyList()
+
+                // Combinar: locales primero, luego API sin duplicados
+                val localIds = localResults.map { it.id }.toSet()
+                _searchResults.value = localResults + apiResults.filter { it.id !in localIds }
             } catch (e: Exception) {
-                android.util.Log.e("SEARCH_ERROR", "Error searching: $query", e)
                 FirebaseCrashlytics.getInstance().recordException(e)
                 _isOffline.value = true
-                _searchResults.value = emptyList()
             } finally {
                 _isLoading.value = false
             }

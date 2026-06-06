@@ -39,10 +39,6 @@
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".JsonRecipeImportActivity"
-            android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
-        <activity
             android:name=".LoginActivity"
             android:exported="true">
         </activity>

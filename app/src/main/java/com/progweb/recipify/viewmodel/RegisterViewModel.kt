@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import com.progweb.recipify.com.progweb.recipify.datamodels.UsuariosManager
 
 class RegisterViewModel : ViewModel() {
 
@@ -103,10 +102,6 @@ class RegisterViewModel : ViewModel() {
                     )
                     
                     db.collection("users").document(uid).set(userData).await()
-
-                    val nuevoUsuario = UsuariosManager.Usuario(usuario, nombre, apellido, password)
-                    UsuariosManager.usuarios[usuario] = nuevoUsuario
-                    
                     _registerState.value = RegisterResult(success = true, usuario = usuario)
                 } catch (e: Exception) {
                     FirebaseCrashlytics.getInstance().recordException(e)
