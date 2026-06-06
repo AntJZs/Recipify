@@ -13,12 +13,16 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.bumptech.glide.Glide
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
+import com.google.firebase.firestore.Source
 import com.google.firebase.firestore.firestore
 import com.google.firebase.storage.storage
 import com.progweb.recipify.R
 import com.progweb.recipify.databinding.ActivityAddRecipeBinding
+import com.progweb.recipify.datamodels.Recipe
+import com.progweb.recipify.util.NetworkUtils
 import com.progweb.recipify.viewmodel.AddRecipeViewModel
 import kotlinx.coroutines.launch
 import org.json.JSONException
@@ -27,11 +31,18 @@ import java.util.UUID
 
 class AddRecipe : AppCompatActivity() {
 
+    companion object {
+        const val EXTRA_RECIPE = "extra_recipe"
+    }
+
     private val db = Firebase.firestore
     private val storage = Firebase.storage
     private lateinit var binding: ActivityAddRecipeBinding
     private val viewModel: AddRecipeViewModel by viewModels()
     private var selectedImageUri: Uri? = null
+
+    private var editingRecipeId: String? = null
+    private var existingImageUrl: String = ""
 
     private val imagePickerLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         uri?.let {
@@ -53,9 +64,28 @@ class AddRecipe : AppCompatActivity() {
             insets
         }
 
+        val recipe = intent.getSerializableExtra(EXTRA_RECIPE) as? Recipe
+        if (recipe != null) {
+            editingRecipeId = recipe.id
+            existingImageUrl = recipe.imageURL
+            prefillFields(recipe)
+            binding.btnGuardar.text = getString(R.string.btn_guardar_cambios)
+        }
+
         setupListeners()
         setupObservers()
-        loadDraft()
+        if (editingRecipeId == null) loadDraft()
+    }
+
+    private fun prefillFields(recipe: Recipe) {
+        binding.etNombre.setText(recipe.name)
+        binding.etTiempo.setText(recipe.totalTimeMinutes.toString())
+        binding.etCategoria.setText(recipe.category.joinToString(", "))
+        binding.etIngredients.setText(recipe.getFormattedIngredients().joinToString("\n"))
+        binding.etBody.setText(recipe.body.ifEmpty { recipe.description })
+        if (recipe.imageURL.isNotEmpty()) {
+            Glide.with(this).load(recipe.imageURL).into(binding.ivRecipePreview)
+        }
     }
 
     private fun setupListeners() {
@@ -101,7 +131,7 @@ class AddRecipe : AppCompatActivity() {
         val editText = binding.etBody
         val selectionStart = editText.selectionStart
         val text = editText.text.toString()
-        var lineStart = text.lastIndexOf('\n', selectionStart - 1) + 1
+        val lineStart = text.lastIndexOf('\n', selectionStart - 1) + 1
         val newText = text.substring(0, lineStart) + prefix + text.substring(lineStart)
         editText.setText(newText)
         editText.setSelection(selectionStart + prefix.length)
@@ -111,7 +141,7 @@ class AddRecipe : AppCompatActivity() {
         val editText = binding.etBody
         val selectionStart = editText.selectionStart
         val text = editText.text.toString()
-        var lineStart = text.lastIndexOf('\n', selectionStart - 1) + 1
+        val lineStart = text.lastIndexOf('\n', selectionStart - 1) + 1
         val newText = text.substring(0, lineStart) + "1. " + text.substring(lineStart)
         editText.setText(newText)
         editText.setSelection(selectionStart + 3)
@@ -148,7 +178,9 @@ class AddRecipe : AppCompatActivity() {
             return
         }
 
-        if (selectedImageUri != null) {
+        val online = NetworkUtils.isOnline(this)
+
+        if (selectedImageUri != null && online) {
             val imageRef = storage.reference.child("recipes/${UUID.randomUUID()}.jpg")
             imageRef.putFile(selectedImageUri!!)
                 .addOnSuccessListener {
@@ -162,50 +194,70 @@ class AddRecipe : AppCompatActivity() {
                     viewModel.resetAfterFailure()
                 }
         } else {
-            saveToFirestore("https://placehold.net/recipe.png")
+            if (!online && selectedImageUri != null) {
+                Snackbar.make(binding.root,
+                    "Sin conexión. La receta se guardará sin la nueva imagen y se sincronizará cuando tengas internet.",
+                    Snackbar.LENGTH_LONG).show()
+            }
+            val imageUrl = if (existingImageUrl.isNotEmpty()) existingImageUrl
+                           else "https://placehold.net/recipe.png"
+            saveToFirestore(imageUrl)
         }
     }
 
     private fun saveToFirestore(imageURL: String) {
         val user = Firebase.auth.currentUser ?: return
-        
-        db.collection("users").document(user.uid).get().addOnSuccessListener { doc ->
-            val authorName = if (doc.exists()) {
-                doc.getString("displayName") ?: doc.getString("username") ?: "Usuario"
-            } else {
-                user.displayName ?: "Usuario"
-            }
+        val authorName = user.displayName ?: "Usuario"
 
-            val recipeData = hashMapOf(
-                "name"             to binding.etNombre.text.toString(),
-                "totalTimeMinutes" to binding.etTiempo.text.toString().toLong(),
-                "body"             to binding.etBody.text.toString(),
-                "category"         to binding.etCategoria.text.toString()
-                                          .split(",")
-                                          .map { it.trim() }
-                                          .filter { it.isNotEmpty() },
-                "userId"           to user.uid,
-                "authorName"       to authorName,
-                "createdAt"        to com.google.firebase.Timestamp.now(),
-                "description"      to (binding.etBody.text?.take(100)?.toString() ?: ""),
-                "imageURL"         to imageURL,
-                "ingredients"      to binding.etIngredients.text.toString()
-                                          .split("\n")
-                                          .map { it.trim() }
-                                          .filter { it.isNotEmpty() },
-                "area"             to "Colombia"
-            )
-
-            db.collection("recipe").add(recipeData).addOnSuccessListener {
-                Toast.makeText(this, getString(R.string.msg_receta_guardada), Toast.LENGTH_SHORT).show()
-                clearDraft()
-                finish()
-            }.addOnFailureListener { e ->
-                android.util.Log.e("AddRecipe", "Error al guardar receta", e)
-                viewModel.resetAfterFailure()
-                Toast.makeText(this, getString(R.string.msg_error_guardar_receta), Toast.LENGTH_LONG).show()
+        // Source.CACHE is instant (no network). Falls back to auth displayName if doc not cached.
+        db.collection("users").document(user.uid).get(Source.CACHE)
+            .addOnSuccessListener { doc ->
+                val name = doc.getString("displayName")
+                    ?: doc.getString("username")
+                    ?: authorName
+                commitRecipe(imageURL, user.uid, name)
             }
+            .addOnFailureListener {
+                commitRecipe(imageURL, user.uid, authorName)
+            }
+    }
+
+    private fun commitRecipe(imageURL: String, userId: String, authorName: String) {
+        val recipeData = hashMapOf(
+            "name"             to binding.etNombre.text.toString(),
+            "totalTimeMinutes" to binding.etTiempo.text.toString().toLong(),
+            "body"             to binding.etBody.text.toString(),
+            "category"         to binding.etCategoria.text.toString()
+                                      .split(",")
+                                      .map { it.trim() }
+                                      .filter { it.isNotEmpty() },
+            "userId"           to userId,
+            "authorName"       to authorName,
+            "description"      to (binding.etBody.text?.take(100)?.toString() ?: ""),
+            "imageURL"         to imageURL,
+            "ingredients"      to binding.etIngredients.text.toString()
+                                      .split("\n")
+                                      .map { it.trim() }
+                                      .filter { it.isNotEmpty() },
+            "area"             to "Colombia"
+        )
+
+        val recipeId = editingRecipeId
+        val isEdit = recipeId != null
+        val successMsg = if (isEdit) "Receta actualizada" else getString(R.string.msg_receta_guardada)
+
+        // Fire-and-forget: Firestore writes to local cache first, syncs when online.
+        // Never wait for server ACK — success listeners only fire when server confirms.
+        if (isEdit) {
+            db.collection("recipe").document(recipeId!!).set(recipeData)
+        } else {
+            recipeData["createdAt"] = com.google.firebase.Timestamp.now()
+            db.collection("recipe").add(recipeData)
+            clearDraft()
         }
+
+        Toast.makeText(this, successMsg, Toast.LENGTH_SHORT).show()
+        finish()
     }
 
     private fun loadDraft() {
@@ -220,7 +272,7 @@ class AddRecipe : AppCompatActivity() {
             binding.etCategoria.setText(obj.optString("categories"))
             binding.etIngredients.setText(obj.optString("ingredients"))
             binding.etBody.setText(obj.optString("body"))
-            
+
             val imageUriStr = obj.optString("imageUri")
             if (imageUriStr.isNotEmpty()) {
                 selectedImageUri = Uri.parse(imageUriStr)
@@ -238,7 +290,7 @@ class AddRecipe : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        saveDraft()
+        if (editingRecipeId == null) saveDraft()
     }
 
     private fun saveDraft() {
