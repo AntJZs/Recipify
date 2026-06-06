@@ -16,7 +16,6 @@ import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
-import com.google.firebase.firestore.Source
 import com.google.firebase.firestore.firestore
 import com.google.firebase.storage.storage
 import com.progweb.recipify.R
@@ -208,19 +207,7 @@ class AddRecipe : AppCompatActivity() {
 
     private fun saveToFirestore(imageURL: String) {
         val user = Firebase.auth.currentUser ?: return
-        val authorName = user.displayName ?: "Usuario"
-
-        // Source.CACHE is instant (no network). Falls back to auth displayName if doc not cached.
-        db.collection("users").document(user.uid).get(Source.CACHE)
-            .addOnSuccessListener { doc ->
-                val name = doc.getString("displayName")
-                    ?: doc.getString("username")
-                    ?: authorName
-                commitRecipe(imageURL, user.uid, name)
-            }
-            .addOnFailureListener {
-                commitRecipe(imageURL, user.uid, authorName)
-            }
+        commitRecipe(imageURL, user.uid, user.displayName ?: "Usuario")
     }
 
     private fun commitRecipe(imageURL: String, userId: String, authorName: String) {
