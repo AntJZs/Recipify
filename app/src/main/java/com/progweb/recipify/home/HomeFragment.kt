@@ -78,12 +78,7 @@ class HomeFragment : Fragment() {
                 when (item.itemId) {
 
                     R.id.menu_editar -> {
-                        Toast.makeText(requireContext(), "Editar información", Toast.LENGTH_SHORT).show()
-                        true
-                    }
-
-                    R.id.menu_compartir -> {
-                        Toast.makeText(requireContext(), "Compartir perfil", Toast.LENGTH_SHORT).show()
+                        startActivity(Intent(requireContext(), com.progweb.recipify.ProfileSetupActivity::class.java))
                         true
                     }
 
